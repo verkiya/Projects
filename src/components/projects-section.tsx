@@ -1,25 +1,17 @@
 import { projects } from "@/lib/data";
-import { SectionHeader } from "./section-header";
 import { ProjectCard } from "./project-card";
-import { Stagger, StaggerItem } from "./motion-wrapper";
 
 export function ProjectsSection() {
   return (
-    <section className="px-6 py-24 md:py-32" id="projects">
-      <div className="mx-auto max-w-6xl">
-        <SectionHeader
-          title="Projects"
-          subtitle="Flagship products I've designed and engineered — each built to solve real problems with production-grade architecture."
-        />
-
-        <Stagger className="space-y-8 md:space-y-12" staggerDelay={0.15}>
-          {projects.map((project) => (
-            <StaggerItem key={project.id}>
-              <ProjectCard project={project} />
-            </StaggerItem>
-          ))}
-        </Stagger>
-      </div>
+    <section className="h-screen w-full flex flex-col overflow-y-scroll snap-y snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]" id="projects">
+      {projects.map((project) => (
+        <div 
+          key={project.id} 
+          className="h-screen min-h-screen w-full snap-start snap-always relative flex items-center justify-center p-6 pt-24 shrink-0"
+        >
+          <ProjectCard project={project} />
+        </div>
+      ))}
     </section>
   );
 }

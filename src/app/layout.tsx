@@ -62,7 +62,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${jetbrainsMono.variable} dark`}
+      className={`${inter.variable} ${jetbrainsMono.variable} dark snap-y snap-mandatory scroll-smooth`}
     >
       <body className="min-h-dvh bg-background text-text-primary antialiased">
         {children}

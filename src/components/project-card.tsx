@@ -5,201 +5,252 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
 import type { Project } from "@/lib/data";
 import { TechBadge } from "./tech-badge";
-import { VideoPlayer } from "./video-player";
-import { ArchitectureSection } from "./architecture-section";
 
 interface ProjectCardProps {
   project: Project;
 }
 
-function StatusBadge({ status }: { status: Project["status"] }) {
-  const config = {
-    Live: { dot: "status-dot-live", text: "status-live" },
-    Beta: { dot: "status-dot-beta", text: "status-beta" },
-    "In Development": { dot: "status-dot-dev", text: "status-dev" },
-    "Coming Soon": { dot: "status-dot-dev", text: "status-dev" },
-  };
-
-  const { dot, text } = config[status];
-
-  return (
-    <span className={`flex items-center text-xs ${text}`}>
-      <span className={`status-dot ${dot}`} />
-      {status}
-    </span>
-  );
-}
+const PLACEHOLDER_IMAGES = [
+  "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1555421689-491a97ff2040?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&w=800&q=80"
+];
 
 export function ProjectCard({ project }: ProjectCardProps) {
-  const [showVideo, setShowVideo] = useState(false);
-  const [showArchitecture, setShowArchitecture] = useState(false);
+  const [flippedState, setFlippedState] = useState<"front" | "demo" | "walkthrough">("front");
+  const isFlipped = flippedState !== "front";
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  // Use available project images and fill the rest with placeholders
+  const imageCount = Math.max(6, (project.images || []).length);
+  const images = [...(project.images || []), ...PLACEHOLDER_IMAGES].slice(0, imageCount);
+  const marqueeImages = [...images, ...images];
 
   return (
-    <article className="premium-card animated-border overflow-hidden">
-      {/* Thumbnail */}
-      <div className="relative aspect-[16/9] overflow-hidden bg-surface">
-        <Image
-          src={project.thumbnail}
-          alt={`${project.name} — ${project.tagline}`}
-          fill
-          className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 800px"
-        />
-        {/* Subtle gradient overlay at bottom */}
-        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-surface to-transparent" />
-      </div>
+    <div className="relative w-full max-w-[95vw] xl:max-w-[1400px] mx-auto my-8 [perspective:2000px] group">
 
-      {/* Content */}
-      <div className="p-6 md:p-8">
-        {/* Header */}
-        <div className="mb-4 flex items-start justify-between gap-4">
-          <div>
-            <h3 className="text-xl font-semibold text-text-primary">
-              {project.name}
-            </h3>
-            <p className="mt-0.5 font-mono text-sm text-text-tertiary">
-              {project.tagline}
-            </p>
-          </div>
-          <StatusBadge status={project.status} />
-        </div>
+      {/* Vibrant Ambient Glow */}
+      <div 
+        className="absolute inset-0 blur-[80px] -z-10 rounded-[4rem] scale-95 opacity-40 group-hover:opacity-60 transition-opacity duration-700 mix-blend-screen" 
+        style={{ 
+          background: `radial-gradient(circle at 50% 50%, rgba(244, 114, 182, 0.4), transparent 70%)`
+        }}
+      />
 
-        {/* Description */}
-        <p className="mb-6 text-sm leading-relaxed text-text-secondary">
-          {project.description}
-        </p>
 
-        {/* Tech Stack */}
-        <div className="mb-6 flex flex-wrap gap-1.5">
-          {project.technologies.map((tech) => (
-            <TechBadge key={tech} name={tech} />
-          ))}
-        </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-wrap items-center gap-2">
-          {project.links.demo && (
-            <a
-              href={project.links.demo}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex h-8 items-center rounded-md bg-text-primary px-3 text-xs font-medium text-background transition-colors hover:bg-accent-dim"
-            >
-              Live Demo
-            </a>
+      {/* Left CTA: Quick Demo */}
+      {project.links.demo && (
+        <button
+          onClick={() => setFlippedState(flippedState === 'demo' ? 'front' : 'demo')}
+          className="absolute -left-4 md:-left-8 lg:-left-20 top-1/2 -translate-y-1/2 z-50 flex items-center gap-2 rounded-full bg-surface-elevated/95 backdrop-blur-xl border border-border/60 px-3 py-2 md:px-5 md:py-3 shadow-[0_0_40px_-10px_rgba(0,0,0,0.5)] text-text-primary transition-all hover:scale-105 hover:border-white/20 cursor-pointer group"
+        >
+          {project.icon && (
+            <Image src={project.icon} alt="Icon" width={18} height={18} className="rounded-[4px] bg-white/10 p-0.5" />
           )}
+          <span className="hidden md:inline font-semibold text-sm">{flippedState === 'demo' ? 'Close Demo' : 'Quick Demo'}</span>
+        </button>
+      )}
 
-          {project.links.github && (
-            <a
-              href={project.links.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border px-3 text-xs text-text-secondary transition-colors hover:border-text-muted hover:text-text-primary"
-            >
-              <svg
-                width="12"
-                height="12"
-                viewBox="0 0 16 16"
-                fill="currentColor"
-              >
-                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
-              </svg>
-              GitHub
-            </a>
-          )}
-
-          <button
-            onClick={() => setShowArchitecture(!showArchitecture)}
-            className={`inline-flex h-8 items-center gap-1.5 rounded-md border px-3 text-xs transition-colors ${
-              showArchitecture
-                ? "border-text-muted bg-surface-elevated text-text-primary"
-                : "border-border text-text-secondary hover:border-text-muted hover:text-text-primary"
-            }`}
-          >
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 12 12"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.2"
-            >
-              <rect x="1" y="1" width="3.5" height="3.5" rx="0.5" />
-              <rect x="7.5" y="1" width="3.5" height="3.5" rx="0.5" />
-              <rect x="4.25" y="7.5" width="3.5" height="3.5" rx="0.5" />
-              <path d="M2.75 4.5V6a.5.5 0 00.5.5h5.5a.5.5 0 00.5-.5V4.5M6 6.5V7.5" />
+      {/* Right CTA: Project Walkthrough */}
+      {project.links.video && (
+        <button
+          onClick={() => setFlippedState(flippedState === 'walkthrough' ? 'front' : 'walkthrough')}
+          className="absolute -right-4 md:-right-8 lg:-right-20 top-1/2 -translate-y-1/2 z-50 flex items-center gap-2 rounded-full bg-surface-elevated/95 backdrop-blur-xl border border-border/60 px-3 py-2 md:px-5 md:py-3 shadow-[0_0_40px_-10px_rgba(0,0,0,0.5)] text-text-primary transition-all hover:scale-105 hover:border-white/20 cursor-pointer group"
+        >
+          <span className="hidden md:inline font-semibold text-sm">{flippedState === 'walkthrough' ? 'Close Video' : 'Project Walkthrough'}</span>
+          {project.icon ? (
+            <Image src={project.icon} alt="Icon" width={18} height={18} className="rounded-[4px] bg-white/10 p-0.5" />
+          ) : (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              {flippedState === 'walkthrough' ? (
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              ) : (
+                <polygon points="5 3 19 12 5 21 5 3" fill="currentColor" stroke="none" />
+              )}
             </svg>
-            Architecture
-          </button>
-
-          {project.video && (
-            <button
-              onClick={() => setShowVideo(!showVideo)}
-              className={`inline-flex h-8 items-center gap-1.5 rounded-md border px-3 text-xs transition-colors ${
-                showVideo
-                  ? "border-text-muted bg-surface-elevated text-text-primary"
-                  : "border-border text-text-secondary hover:border-text-muted hover:text-text-primary"
-              }`}
-            >
-              <svg
-                width="12"
-                height="12"
-                viewBox="0 0 12 12"
-                fill="currentColor"
-              >
-                <path d="M4.5 3v6l5-3z" />
-              </svg>
-              Watch Demo
-            </button>
           )}
-        </div>
-      </div>
+        </button>
+      )}
 
-      {/* Expandable Video Section */}
-      <AnimatePresence>
-        {showVideo && project.video && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
-            className="overflow-hidden border-t border-border"
+      <motion.div
+        className="w-full relative [transform-style:preserve-3d]"
+        animate={{ rotateY: isFlipped ? 180 : 0 }}
+        transition={{ duration: 0.8, type: "spring", stiffness: 200, damping: 20 }}
+      >
+
+        {/* FRONT FACE (Carousel) */}
+        <article 
+          className="w-full backdrop-blur-3xl border border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl relative flex flex-col [backface-visibility:hidden] transition-transform duration-500"
+          style={{ backgroundColor: project.themeColor ? `${project.themeColor}10` : 'rgba(255,255,255,0.02)' }}
+        >
+          {/* Animated Rotating Border */}
+          <div 
+            className="absolute inset-0 z-50 pointer-events-none rounded-[2.5rem] p-[2px]"
+            style={{
+              WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+              WebkitMaskComposite: 'xor',
+              maskComposite: 'exclude',
+            }}
           >
-            <div className="p-6 md:p-8" id={`${project.id}-video`}>
-              <VideoPlayer
-                src={project.video.src}
-                poster={project.video.poster}
-                duration={project.video.duration}
-                hasCaptions={project.video.hasCaptions}
-                hasArchitectureWalkthrough={
-                  project.video.hasArchitectureWalkthrough
-                }
-                title={project.name}
-              />
+            <div className="absolute inset-[-100%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_0deg,transparent_0_75%,#f472b6_100%)] opacity-80" />
+          </div>
+
+          {/* Top Details */}
+          <div className="z-10 text-center px-6 md:px-12 pt-12 pb-8 flex flex-col items-center">
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="font-mono text-accent text-sm mb-3 tracking-wider uppercase"
+            >
+              {project.tagline}
+            </motion.p>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="flex items-center gap-4 mb-4"
+            >
+              <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-text-primary">
+                {project.name}
+              </h2>
+              {project.links.demo && (
+                 <a
+                   href={project.links.demo}
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   className="inline-flex h-9 items-center rounded-full bg-surface-elevated border border-white/20 px-4 text-sm font-semibold text-text-primary transition-all hover:scale-105 shadow-md hover:border-white/40 cursor-pointer"
+                 >
+                   {project.icon && (
+                     <Image
+                       src={project.icon}
+                       alt="Icon"
+                       width={18}
+                       height={18}
+                       className="mr-2 rounded-[4px] p-0.5"
+                     />
+                   )}
+                   View Live Site
+                 </a>
+              )}
+            </motion.div>
+          </div>
+
+
+
+          {/* Infinite Marquee Carousel */}
+          <div className="w-full relative flex items-center py-6 overflow-hidden">
+            <div 
+              className={`flex gap-4 md:gap-6 w-max px-4 animate-marquee ${selectedImage ? '[animation-play-state:paused]' : 'hover:[animation-play-state:paused]'}`}
+            >
+              {marqueeImages.map((image, idx) => (
+                <div
+                  key={idx}
+                  onClick={() => setSelectedImage(image)}
+                  className="relative shrink-0 w-[320px] sm:w-[480px] md:w-[600px] xl:w-[720px] aspect-[16/9] rounded-2xl overflow-hidden ring-1 ring-white/10 shadow-xl bg-surface-elevated transition-transform duration-500 hover:scale-[1.03] cursor-pointer"
+                >
+                  <Image
+                    src={image}
+                    alt={`${project.name} preview ${idx + 1}`}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 640px, (max-width: 1024px) 960px, (max-width: 1280px) 1200px, 1440px"
+                    quality={95}
+                  />
+                </div>
+              ))}
             </div>
+          </div>
+
+          {/* Bottom Tech & Links */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+            className="relative z-10 flex flex-col items-center gap-6 px-6 pb-10 pt-16 -mt-8 bg-gradient-to-t from-background via-background/95 to-transparent"
+          >
+            <div className="flex flex-nowrap overflow-x-auto justify-start md:justify-center gap-2 w-auto max-w-full px-5 py-2.5 bg-surface-elevated/40 backdrop-blur-md rounded-full border border-border/50 shadow-inner [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {project.technologies.map(tech => (
+                <TechBadge key={tech} name={tech} />
+              ))}
+            </div>
+          </motion.div>
+        </article>
+
+        {/* BACK FACE (Video Iframe) */}
+        <article className="absolute inset-0 w-full h-full bg-black/90 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col [backface-visibility:hidden] [transform:rotateY(180deg)]">
+          {/* Animated Rotating Border */}
+          <div 
+            className="absolute inset-0 z-50 pointer-events-none rounded-[2.5rem] p-[2px]"
+            style={{
+              WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+              WebkitMaskComposite: 'xor',
+              maskComposite: 'exclude',
+            }}
+          >
+            <div className="absolute inset-[-100%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_0deg,transparent_0_75%,#f472b6_100%)] opacity-80" />
+          </div>
+
+          <div className="flex-1 w-full h-full relative">
+            {isFlipped && (
+              <iframe
+                className="absolute inset-0 w-full h-full rounded-[2.5rem]"
+                src={flippedState === 'walkthrough' ? (project.links.video || "https://www.youtube.com/embed/dQw4w9WgXcQ?controls=1&rel=0") : (project.links.demo || "")}
+                title={flippedState === 'walkthrough' ? `${project.name} Demo Video` : `${project.name} Quick Demo`}
+                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            )}
+          </div>
+        </article>
+
+      </motion.div>
+
+      {/* Image Modal */}
+      <AnimatePresence>
+        {selectedImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSelectedImage(null)}
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/95 backdrop-blur-lg cursor-pointer"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="relative w-full h-full cursor-default flex items-center justify-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Image
+                src={selectedImage}
+                alt="Enlarged view"
+                fill
+                className="object-contain"
+                sizes="100vw"
+                quality={100}
+              />
+              <button
+                onClick={() => setSelectedImage(null)}
+                className="absolute top-6 right-6 md:top-8 md:right-8 p-3 md:p-4 bg-white/10 hover:bg-white/20 text-white rounded-full backdrop-blur-md transition-colors cursor-pointer border border-white/20 shadow-2xl z-50"
+                aria-label="Close modal"
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Expandable Architecture Section */}
-      <AnimatePresence>
-        {showArchitecture && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
-            className="overflow-hidden border-t border-border"
-          >
-            <div className="p-6 md:p-8">
-              <ArchitectureSection
-                architecture={project.architecture}
-                projectName={project.name}
-              />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </article>
+    </div>
   );
 }

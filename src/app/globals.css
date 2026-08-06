@@ -1,23 +1,58 @@
 @import "tailwindcss";
 
-/* ─── Design Tokens ───────────────────────────────────────────────────────── */
+:root {
+  --app-bg: #ffffff;
+  --app-surface: #fafafa;
+  --app-surface-elevated: #ffffff;
+  --app-border: #e4e4e7;
+  --app-border-subtle: #f4f4f5;
+  --app-text-primary: #09090b;
+  --app-text-secondary: #52525b;
+  --app-text-tertiary: #a1a1aa;
+  --app-text-muted: #d4d4d8;
+  --app-accent: #18181b;
+  --app-accent-dim: #71717a;
+  --app-foreground: #09090b;
+}
+
+.dark {
+  --app-bg: #09090b;
+  --app-surface: #111113;
+  --app-surface-elevated: #18181b;
+  --app-border: #1e1e22;
+  --app-border-subtle: #161618;
+  --app-text-primary: #fafafa;
+  --app-text-secondary: #a1a1aa;
+  --app-text-tertiary: #71717a;
+  --app-text-muted: #52525b;
+  --app-accent: #e4e4e7;
+  --app-accent-dim: #a1a1aa;
+  --app-foreground: #fafafa;
+}
 
 @theme inline {
-  --color-background: #09090b;
-  --color-surface: #111113;
-  --color-surface-elevated: #18181b;
-  --color-border: #1e1e22;
-  --color-border-subtle: #161618;
-  --color-text-primary: #fafafa;
-  --color-text-secondary: #a1a1aa;
-  --color-text-tertiary: #71717a;
-  --color-text-muted: #52525b;
-  --color-accent: #e4e4e7;
-  --color-accent-dim: #a1a1aa;
-  --color-foreground: #fafafa;
+  --color-background: var(--app-bg);
+  --color-surface: var(--app-surface);
+  --color-surface-elevated: var(--app-surface-elevated);
+  --color-border: var(--app-border);
+  --color-border-subtle: var(--app-border-subtle);
+  --color-text-primary: var(--app-text-primary);
+  --color-text-secondary: var(--app-text-secondary);
+  --color-text-tertiary: var(--app-text-tertiary);
+  --color-text-muted: var(--app-text-muted);
+  --color-accent: var(--app-accent);
+  --color-accent-dim: var(--app-accent-dim);
+  --color-foreground: var(--app-foreground);
 
   --font-sans: var(--font-inter);
   --font-mono: var(--font-jetbrains-mono);
+  
+  --animate-marquee: marquee 60s linear infinite;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
 }
 
 /* ─── Base ────────────────────────────────────────────────────────────────── */
