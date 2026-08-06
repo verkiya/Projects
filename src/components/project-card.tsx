@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import type { Project } from "@/lib/data";
 import { TechBadge } from "./tech-badge";
 
@@ -20,50 +20,88 @@ const PLACEHOLDER_IMAGES = [
 ];
 
 export function ProjectCard({ project }: ProjectCardProps) {
-  const [isFlipped, setIsFlipped] = useState(false);
+  const [flippedState, setFlippedState] = useState<"front" | "demo" | "walkthrough">("front");
+  const isFlipped = flippedState !== "front";
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   // Use available project images and fill the rest with placeholders
-  const images = [...(project.images || []), ...PLACEHOLDER_IMAGES].slice(0, 6);
+  const imageCount = Math.max(6, (project.images || []).length);
+  const images = [...(project.images || []), ...PLACEHOLDER_IMAGES].slice(0, imageCount);
   const marqueeImages = [...images, ...images];
 
   return (
     <div className="relative w-full max-w-[95vw] xl:max-w-[1400px] mx-auto my-8 [perspective:2000px] group">
-      
-      {/* Subtle Background Glow */}
-      <div className="absolute inset-0 bg-gradient-to-tr from-accent/20 via-purple-500/10 to-transparent blur-[80px] -z-10 rounded-[4rem] scale-95 opacity-50 group-hover:opacity-100 transition-opacity duration-700" />
-      
-      {/* Navigation Arrows for Flipping */}
-      <button 
-        onClick={() => setIsFlipped(!isFlipped)}
-        className="absolute -left-2 md:-left-6 top-1/2 -translate-y-1/2 z-50 p-3 md:p-4 bg-surface-elevated/90 hover:bg-surface-elevated border border-border rounded-full backdrop-blur-xl shadow-2xl text-text-primary transition-all hover:scale-110"
-        aria-label="Flip card"
-      >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M15 18l-6-6 6-6" />
-        </svg>
-      </button>
-      
-      <button 
-        onClick={() => setIsFlipped(!isFlipped)}
-        className="absolute -right-2 md:-right-6 top-1/2 -translate-y-1/2 z-50 p-3 md:p-4 bg-surface-elevated/90 hover:bg-surface-elevated border border-border rounded-full backdrop-blur-xl shadow-2xl text-text-primary transition-all hover:scale-110"
-        aria-label="Flip card"
-      >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M9 18l6-6-6-6" />
-        </svg>
-      </button>
+
+      {/* Vibrant Ambient Glow */}
+      <div 
+        className="absolute inset-0 blur-[80px] -z-10 rounded-[4rem] scale-95 opacity-40 group-hover:opacity-60 transition-opacity duration-700 mix-blend-screen" 
+        style={{ 
+          background: `radial-gradient(circle at 50% 50%, rgba(244, 114, 182, 0.4), transparent 70%)`
+        }}
+      />
+
+
+
+      {/* Left CTA: Quick Demo */}
+      {project.links.demo && (
+        <button
+          onClick={() => setFlippedState(flippedState === 'demo' ? 'front' : 'demo')}
+          className="absolute -left-4 md:-left-8 lg:-left-20 top-1/2 -translate-y-1/2 z-50 flex items-center gap-2 rounded-full bg-surface-elevated/95 backdrop-blur-xl border border-border/60 px-3 py-2 md:px-5 md:py-3 shadow-[0_0_40px_-10px_rgba(0,0,0,0.5)] text-text-primary transition-all hover:scale-105 hover:border-white/20 cursor-pointer group"
+        >
+          {project.icon && (
+            <Image src={project.icon} alt="Icon" width={18} height={18} className="rounded-[4px] bg-white/10 p-0.5" />
+          )}
+          <span className="hidden md:inline font-semibold text-sm">{flippedState === 'demo' ? 'Close Demo' : 'Quick Demo'}</span>
+        </button>
+      )}
+
+      {/* Right CTA: Project Walkthrough */}
+      {project.links.video && (
+        <button
+          onClick={() => setFlippedState(flippedState === 'walkthrough' ? 'front' : 'walkthrough')}
+          className="absolute -right-4 md:-right-8 lg:-right-20 top-1/2 -translate-y-1/2 z-50 flex items-center gap-2 rounded-full bg-surface-elevated/95 backdrop-blur-xl border border-border/60 px-3 py-2 md:px-5 md:py-3 shadow-[0_0_40px_-10px_rgba(0,0,0,0.5)] text-text-primary transition-all hover:scale-105 hover:border-white/20 cursor-pointer group"
+        >
+          <span className="hidden md:inline font-semibold text-sm">{flippedState === 'walkthrough' ? 'Close Video' : 'Project Walkthrough'}</span>
+          {project.icon ? (
+            <Image src={project.icon} alt="Icon" width={18} height={18} className="rounded-[4px] bg-white/10 p-0.5" />
+          ) : (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              {flippedState === 'walkthrough' ? (
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              ) : (
+                <polygon points="5 3 19 12 5 21 5 3" fill="currentColor" stroke="none" />
+              )}
+            </svg>
+          )}
+        </button>
+      )}
 
       <motion.div
         className="w-full relative [transform-style:preserve-3d]"
         animate={{ rotateY: isFlipped ? 180 : 0 }}
         transition={{ duration: 0.8, type: "spring", stiffness: 200, damping: 20 }}
       >
-        
+
         {/* FRONT FACE (Carousel) */}
-        <article className="w-full bg-surface/30 backdrop-blur-2xl border border-border/40 rounded-[2.5rem] overflow-hidden shadow-2xl relative flex flex-col [backface-visibility:hidden]">
+        <article 
+          className="w-full backdrop-blur-3xl border border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl relative flex flex-col [backface-visibility:hidden] transition-transform duration-500"
+          style={{ backgroundColor: project.themeColor ? `${project.themeColor}10` : 'rgba(255,255,255,0.02)' }}
+        >
+          {/* Animated Rotating Border */}
+          <div 
+            className="absolute inset-0 z-50 pointer-events-none rounded-[2.5rem] p-[2px]"
+            style={{
+              WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+              WebkitMaskComposite: 'xor',
+              maskComposite: 'exclude',
+            }}
+          >
+            <div className="absolute inset-[-100%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_0deg,transparent_0_75%,#f472b6_100%)] opacity-80" />
+          </div>
+
           {/* Top Details */}
           <div className="z-10 text-center px-6 md:px-12 pt-12 pb-8 flex flex-col items-center">
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -71,101 +109,101 @@ export function ProjectCard({ project }: ProjectCardProps) {
             >
               {project.tagline}
             </motion.p>
-            <motion.h2 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="text-3xl md:text-5xl font-bold tracking-tight text-text-primary mb-4"
+              className="flex items-center gap-4 mb-4"
             >
-              {project.name}
-            </motion.h2>
-          </div>
-
-          {/* Infinite Marquee Carousel */}
-          <div className="w-full relative flex items-center py-6 overflow-hidden">
-            <div className="absolute inset-y-0 left-0 w-16 md:w-32 bg-gradient-to-r from-surface to-transparent z-10 pointer-events-none" />
-            <div className="absolute inset-y-0 right-0 w-16 md:w-32 bg-gradient-to-l from-surface to-transparent z-10 pointer-events-none" />
-            
-            <motion.div 
-              className="flex gap-4 md:gap-6 w-max px-4"
-              animate={{ x: ["0%", "-50%"] }}
-              transition={{ ease: "linear", duration: 30, repeat: Infinity }}
-            >
-              {marqueeImages.map((image, idx) => (
-                <div 
-                  key={idx} 
-                  className="relative shrink-0 w-[320px] sm:w-[480px] md:w-[600px] xl:w-[720px] aspect-[16/9] rounded-2xl overflow-hidden ring-1 ring-white/10 shadow-xl bg-surface-elevated"
-                >
-                  <Image 
-                    src={image} 
-                    alt={`${project.name} preview ${idx + 1}`}
-                    fill
-                    className="object-cover hover:scale-105 transition-transform duration-700"
-                    sizes="(max-width: 768px) 320px, (max-width: 1024px) 480px, (max-width: 1280px) 600px, 720px"
-                  />
-                </div>
-              ))}
-            </motion.div>
-          </div>
-
-          {/* Bottom Tech & Links */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.3 }}
-            className="z-10 flex flex-col items-center gap-6 px-6 pb-10 pt-4"
-          >
-            <div className="flex flex-wrap justify-center gap-2 max-w-3xl">
-              {project.technologies.map(tech => (
-                <TechBadge key={tech} name={tech} />
-              ))}
-            </div>
-            
-            <div className="flex items-center gap-4 mt-2">
+              <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-text-primary">
+                {project.name}
+              </h2>
               {project.links.demo && (
                  <a
                    href={project.links.demo}
                    target="_blank"
                    rel="noopener noreferrer"
-                   className="inline-flex h-11 items-center rounded-full bg-text-primary px-8 text-sm font-semibold text-background transition-colors hover:bg-accent hover:text-white"
+                   className="inline-flex h-9 items-center rounded-full bg-surface-elevated border border-white/20 px-4 text-sm font-semibold text-text-primary transition-all hover:scale-105 shadow-md hover:border-white/40 cursor-pointer"
                  >
+                   {project.icon && (
+                     <Image
+                       src={project.icon}
+                       alt="Icon"
+                       width={18}
+                       height={18}
+                       className="mr-2 rounded-[4px] p-0.5"
+                     />
+                   )}
                    View Live Site
                  </a>
               )}
-              {project.links.github && (
-                <a
-                  href={project.links.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex h-11 items-center gap-2 rounded-full border border-border px-8 text-sm font-medium text-text-primary transition-colors hover:border-text-muted hover:bg-surface-elevated"
+            </motion.div>
+          </div>
+
+
+
+          {/* Infinite Marquee Carousel */}
+          <div className="w-full relative flex items-center py-6 overflow-hidden">
+            <div 
+              className={`flex gap-4 md:gap-6 w-max px-4 animate-marquee ${selectedImage ? '[animation-play-state:paused]' : 'hover:[animation-play-state:paused]'}`}
+            >
+              {marqueeImages.map((image, idx) => (
+                <div
+                  key={idx}
+                  onClick={() => setSelectedImage(image)}
+                  className="relative shrink-0 w-[320px] sm:w-[480px] md:w-[600px] xl:w-[720px] aspect-[16/9] rounded-2xl overflow-hidden ring-1 ring-white/10 shadow-xl bg-surface-elevated transition-transform duration-500 hover:scale-[1.03] cursor-pointer"
                 >
-                  <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor">
-                    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
-                  </svg>
-                  View Source
-                </a>
-              )}
+                  <Image
+                    src={image}
+                    alt={`${project.name} preview ${idx + 1}`}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 640px, (max-width: 1024px) 960px, (max-width: 1280px) 1200px, 1440px"
+                    quality={95}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Bottom Tech & Links */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+            className="relative z-10 flex flex-col items-center gap-6 px-6 pb-10 pt-16 -mt-8 bg-gradient-to-t from-background via-background/95 to-transparent"
+          >
+            <div className="flex flex-nowrap overflow-x-auto justify-start md:justify-center gap-2 w-auto max-w-full px-5 py-2.5 bg-surface-elevated/40 backdrop-blur-md rounded-full border border-border/50 shadow-inner [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {project.technologies.map(tech => (
+                <TechBadge key={tech} name={tech} />
+              ))}
             </div>
           </motion.div>
         </article>
 
         {/* BACK FACE (Video Iframe) */}
-        <article className="absolute inset-0 w-full h-full bg-black/90 backdrop-blur-3xl border border-border/40 rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col [backface-visibility:hidden] [transform:rotateY(180deg)]">
-          <div className="absolute top-0 inset-x-0 p-8 bg-gradient-to-b from-black/80 to-transparent pointer-events-none flex justify-between items-center z-10">
-            <div>
-              <h3 className="text-2xl font-bold text-white mb-1">{project.name}</h3>
-              <p className="text-zinc-400 text-sm font-mono uppercase tracking-wider">Video Walkthrough</p>
-            </div>
+        <article className="absolute inset-0 w-full h-full bg-black/90 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col [backface-visibility:hidden] [transform:rotateY(180deg)]">
+          {/* Animated Rotating Border */}
+          <div 
+            className="absolute inset-0 z-50 pointer-events-none rounded-[2.5rem] p-[2px]"
+            style={{
+              WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+              WebkitMaskComposite: 'xor',
+              maskComposite: 'exclude',
+            }}
+          >
+            <div className="absolute inset-[-100%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_0deg,transparent_0_75%,#f472b6_100%)] opacity-80" />
           </div>
+
           <div className="flex-1 w-full h-full relative">
             {isFlipped && (
-              <iframe 
-                className="absolute inset-0 w-full h-full"
-                src="https://www.youtube.com/embed/dQw4w9WgXcQ?controls=1&rel=0" 
-                title={`${project.name} Demo Video`}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              <iframe
+                className="absolute inset-0 w-full h-full rounded-[2.5rem]"
+                src={flippedState === 'walkthrough' ? (project.links.video || "https://www.youtube.com/embed/dQw4w9WgXcQ?controls=1&rel=0") : (project.links.demo || "")}
+                title={flippedState === 'walkthrough' ? `${project.name} Demo Video` : `${project.name} Quick Demo`}
+                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               />
             )}
@@ -173,6 +211,46 @@ export function ProjectCard({ project }: ProjectCardProps) {
         </article>
 
       </motion.div>
+
+      {/* Image Modal */}
+      <AnimatePresence>
+        {selectedImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSelectedImage(null)}
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/95 backdrop-blur-lg cursor-pointer"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="relative w-full h-full cursor-default flex items-center justify-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Image
+                src={selectedImage}
+                alt="Enlarged view"
+                fill
+                className="object-contain"
+                sizes="100vw"
+                quality={100}
+              />
+              <button
+                onClick={() => setSelectedImage(null)}
+                className="absolute top-6 right-6 md:top-8 md:right-8 p-3 md:p-4 bg-white/10 hover:bg-white/20 text-white rounded-full backdrop-blur-md transition-colors cursor-pointer border border-white/20 shadow-2xl z-50"
+                aria-label="Close modal"
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

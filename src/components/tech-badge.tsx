@@ -8,7 +8,7 @@ const getBrandColor = (name: string) => {
     "TypeScript": "text-blue-400 border-blue-400/30 bg-blue-400/10",
     "Python": "text-yellow-300 border-yellow-300/30 bg-yellow-300/10",
     "FastAPI": "text-teal-400 border-teal-400/30 bg-teal-400/10",
-    "PostgreSQL": "text-indigo-400 border-indigo-400/30 bg-indigo-400/10",
+    "PostgreSQL": "text-blue-400 border-blue-400/30 bg-blue-400/10",
     "Redis": "text-red-500 border-red-500/30 bg-red-500/10",
     "OpenAI": "text-emerald-400 border-emerald-400/30 bg-emerald-400/10",
     "LangChain": "text-green-500 border-green-500/30 bg-green-500/10",
@@ -17,7 +17,7 @@ const getBrandColor = (name: string) => {
     "Node.js": "text-green-500 border-green-500/30 bg-green-500/10",
     "Bull MQ": "text-orange-500 border-orange-500/30 bg-orange-500/10",
     "React Flow": "text-pink-400 border-pink-400/30 bg-pink-400/10",
-    "Prisma": "text-teal-200 border-teal-200/30 bg-teal-200/10",
+    "Prisma": "text-sky-300 border-sky-300/30 bg-sky-300/10",
     "Stripe": "text-indigo-500 border-indigo-500/30 bg-indigo-500/10",
     "Pinecone": "text-blue-300 border-blue-300/30 bg-blue-300/10",
     "Clerk": "text-violet-500 border-violet-500/30 bg-violet-500/10",
@@ -25,6 +25,13 @@ const getBrandColor = (name: string) => {
     "WebRTC": "text-sky-400 border-sky-400/30 bg-sky-400/10",
     "Deepgram": "text-cyan-400 border-cyan-400/30 bg-cyan-400/10",
     "ElevenLabs": "text-neutral-300 border-neutral-300/30 bg-neutral-300/10",
+    "React": "text-sky-400 border-sky-400/30 bg-sky-400/10",
+    "Tailwind CSS": "text-cyan-400 border-cyan-400/30 bg-cyan-400/10",
+    "tRPC": "text-blue-500 border-blue-500/30 bg-blue-500/10",
+    "AWS S3": "text-orange-500 border-orange-500/30 bg-orange-500/10",
+    "Polar SDK": "text-indigo-400 border-indigo-400/30 bg-indigo-400/10",
+    "Sentry": "text-red-500 border-red-500/30 bg-red-500/10",
+    "Zod": "text-blue-600 border-blue-600/30 bg-blue-600/10",
   };
   return brandColors[name] || "text-text-secondary border-border bg-surface";
 };

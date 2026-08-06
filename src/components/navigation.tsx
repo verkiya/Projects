@@ -11,6 +11,7 @@ export function Navigation() {
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll, { passive: true });
+    
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
@@ -40,70 +41,91 @@ export function Navigation() {
             href="#home"
             className="font-mono text-sm font-medium tracking-wide text-text-primary transition-colors hover:text-accent"
           >
-            verkiya
+            Himanshu Verkiya
           </a>
 
-          {/* Desktop Links */}
-          <ul className="hidden items-center gap-1 md:flex">
-            {navLinks.map((link) => (
-              <li key={link.label}>
+          <div className="flex items-center gap-4 md:gap-6">
+            {/* Desktop Links */}
+            <ul className="hidden items-center gap-3 md:flex">
+              <li>
                 <a
-                  href={link.href}
-                  target={link.external ? "_blank" : undefined}
-                  rel={link.external ? "noopener noreferrer" : undefined}
-                  className="rounded-md px-3 py-2 text-sm text-text-secondary transition-colors hover:text-text-primary"
+                  href="#home"
+                  className="flex items-center gap-2 rounded-full border border-border/50 bg-surface/50 px-4 py-2 text-sm font-medium text-text-secondary transition-all hover:bg-surface-elevated hover:text-text-primary hover:border-border hover:shadow-sm"
                 >
-                  {link.label}
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                  Home
                 </a>
               </li>
-            ))}
-          </ul>
+              <li>
+                <a
+                  href="https://github.com/verkiya"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 rounded-full border border-border/50 bg-surface/50 px-4 py-2 text-sm font-medium text-text-secondary transition-all hover:bg-surface-elevated hover:text-text-primary hover:border-border hover:shadow-sm hover:text-[#2dba4e]"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+                  GitHub
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://linkedin.com/in/himanshuverkiya"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 rounded-full border border-border/50 bg-surface/50 px-4 py-2 text-sm font-medium text-text-secondary transition-all hover:bg-surface-elevated hover:text-text-primary hover:border-border hover:shadow-sm hover:text-[#0a66c2]"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
+                  LinkedIn
+                </a>
+              </li>
+            </ul>
 
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setMobileOpen(!mobileOpen)}
-            className="flex h-8 w-8 items-center justify-center rounded-md text-text-secondary transition-colors hover:text-text-primary md:hidden"
-            aria-label={mobileOpen ? "Close menu" : "Open menu"}
-            aria-expanded={mobileOpen}
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              fill="none"
-              className="transition-transform"
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setMobileOpen(!mobileOpen)}
+              className="flex h-8 w-8 items-center justify-center rounded-md text-text-secondary transition-colors hover:text-text-primary md:hidden"
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileOpen}
             >
-              {mobileOpen ? (
-                <path
-                  d="M4 4L12 12M12 4L4 12"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                />
-              ) : (
-                <>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                className="transition-transform"
+              >
+                {mobileOpen ? (
                   <path
-                    d="M2 4H14"
+                    d="M4 4L12 12M12 4L4 12"
                     stroke="currentColor"
                     strokeWidth="1.5"
                     strokeLinecap="round"
                   />
-                  <path
-                    d="M2 8H14"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                  />
-                  <path
-                    d="M2 12H14"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                  />
-                </>
-              )}
-            </svg>
-          </button>
+                ) : (
+                  <>
+                    <path
+                      d="M2 4H14"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d="M2 8H14"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d="M2 12H14"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                    />
+                  </>
+                )}
+              </svg>
+            </button>
+          </div>
         </nav>
       </motion.header>
 
@@ -127,21 +149,43 @@ export function Navigation() {
               }}
               className="flex h-full flex-col items-center justify-center gap-8"
             >
-              {navLinks.map((link, i) => (
-                <motion.a
-                  key={link.label}
-                  href={link.href}
-                  target={link.external ? "_blank" : undefined}
-                  rel={link.external ? "noopener noreferrer" : undefined}
-                  onClick={() => setMobileOpen(false)}
-                  initial={{ y: 16, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: i * 0.05 + 0.1 }}
-                  className="text-2xl font-light text-text-secondary transition-colors hover:text-text-primary"
-                >
-                  {link.label}
-                </motion.a>
-              ))}
+              <motion.a
+                href="#home"
+                onClick={() => setMobileOpen(false)}
+                initial={{ y: 16, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.1 }}
+                className="text-2xl font-light text-text-secondary transition-colors hover:text-text-primary flex items-center gap-3"
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                Home
+              </motion.a>
+              <motion.a
+                href="https://github.com/verkiya"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setMobileOpen(false)}
+                initial={{ y: 16, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.15 }}
+                className="text-2xl font-light text-text-secondary transition-colors hover:text-[#2dba4e] flex items-center gap-3"
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+                GitHub
+              </motion.a>
+              <motion.a
+                href="https://linkedin.com/in/himanshuverkiya"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setMobileOpen(false)}
+                initial={{ y: 16, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="text-2xl font-light text-text-secondary transition-colors hover:text-[#0a66c2] flex items-center gap-3"
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
+                LinkedIn
+              </motion.a>
             </motion.nav>
           </motion.div>
         )}

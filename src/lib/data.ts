@@ -8,9 +8,11 @@ export interface Project {
   tagline: string;
   description: string;
   thumbnail: string;
+  icon?: string;
   images: string[];
   status: "Live" | "Beta" | "In Development" | "Coming Soon";
   technologies: string[];
+  themeColor?: string;
   links: {
     demo?: string;
     github?: string;
@@ -68,123 +70,35 @@ export const personal = {
 
 export const projects: Project[] = [
   {
-    id: "curate",
-    name: "Curate",
-    tagline: "AI Development Environment",
-    description: "An AI-native browser IDE for building software without leaving the web. Combines a real code editor, AI coding assistant, live preview environment, and GitHub integration.",
-    thumbnail: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=2070&auto=format&fit=crop",
-    images: [
-      "https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=2070&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=2072&auto=format&fit=crop",
-    ],
-    status: "Live",
-    technologies: ["Next.js", "Convex", "Inngest", "TypeScript"],
-    links: {
-      demo: "https://curate-ecru-eight.vercel.app",
-      github: "https://github.com/hiverkiya/Curate",
-    },
-    architecture: {
-      overview: "Coordinates durable cloud state, ephemeral browser state, background AI workflows, and browser-local Node.js runtime.",
-      stack: ["Next.js", "Convex", "Inngest", "AgentKit", "CodeMirror"],
-      decisions: ["State Lifecycle Separation", "Weighted random model selection", "WebContainers for preview"],
-      scaling: [],
-      tradeoffs: [],
-      challenges: [],
-      lessons: [],
-    }
-  },
-  {
     id: "resona",
     name: "Resona",
-    tagline: "AI Voice SaaS",
+    tagline: "AI Voice SaaS — Multi-tenant voice generation with metered billing",
     description: "Full-stack AI voice generation platform with self-hosted inference, multi-tenant organization workspaces, metered subscription billing, and private media delivery.",
-    thumbnail: "https://images.unsplash.com/photo-1589254065878-42c9da997008?q=80&w=2070&auto=format&fit=crop",
+    thumbnail: "/resona/introduction.png",
+    icon: "/resona/icon.svg",
     images: [
-      "https://images.unsplash.com/photo-1589254065878-42c9da997008?q=80&w=2070&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?q=80&w=2070&auto=format&fit=crop",
+      "/resona/introduction.png",
+      "/resona/1.png",
+      "/resona/2.png",
+      "/resona/3.png",
+      "/resona/4.png",
+      "/resona/5.png",
+      "/resona/6.png",
+      "/resona/7.png",
+      "/resona/8.png",
+      "/resona/9.png",
     ],
     status: "Live",
-    technologies: ["Next.js", "React", "TypeScript", "Tailwind CSS", "Prisma", "PostgreSQL", "tRPC", "FastAPI", "Clerk"],
+    themeColor: "#4f46e5",
+    technologies: ["Next.js", "React", "TypeScript", "Tailwind CSS", "Prisma", "PostgreSQL", "tRPC", "FastAPI", "Clerk", "AWS S3", "Polar SDK", "Sentry", "Zod"],
     links: {
       demo: "https://resonapro.vercel.app",
+      video: "https://www.youtube.com/embed/dOfqpe-P-q0?si=lVOCRxK7BwRo-y92"
     },
     architecture: {
       overview: "Combines self-hosted inference with robust multi-tenant capabilities, metered billing, and secure media delivery.",
       stack: ["Next.js", "Modal TTS", "AWS S3", "tRPC", "Prisma"],
       decisions: ["Self-hosted Chatterbox TTS", "Multi-tenant architecture", "Signed URL delivery"],
-      scaling: [],
-      tradeoffs: [],
-      challenges: [],
-      lessons: [],
-    }
-  },
-  {
-    id: "automativ",
-    name: "Automativ",
-    tagline: "Workflow Engine",
-    description: "A visual workflow automation application built with Next.js, React Flow, and Inngest. Build directed workflow graphs in a browser canvas.",
-    thumbnail: "https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?q=80&w=2088&auto=format&fit=crop",
-    images: [
-      "https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?q=80&w=2088&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=2070&auto=format&fit=crop",
-    ],
-    status: "Live",
-    technologies: ["Next.js", "React Flow", "Inngest", "Prisma", "PostgreSQL", "tRPC"],
-    links: {
-      demo: "https://automativ.vercel.app",
-    },
-    architecture: {
-      overview: "Authenticated workflow builder with paid creation gates, external trigger endpoints, and executable nodes.",
-      stack: ["Next.js", "React Flow", "Inngest", "Prisma"],
-      decisions: ["Topological graph sort", "Replace-all transaction for saves"],
-      scaling: [],
-      tradeoffs: [],
-      challenges: [],
-      lessons: [],
-    }
-  },
-  {
-    id: "vocali",
-    name: "Vocali",
-    tagline: "AI Support Platform",
-    description: "A multi-tenant AI support platform with an embeddable chat and voice widget. Configure AI agents with organization documents.",
-    thumbnail: "https://images.unsplash.com/photo-1596524430615-b46475ddff6e?q=80&w=2070&auto=format&fit=crop",
-    images: [
-      "https://images.unsplash.com/photo-1596524430615-b46475ddff6e?q=80&w=2070&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=2070&auto=format&fit=crop",
-    ],
-    status: "Live",
-    technologies: ["Next.js", "Convex", "Clerk", "OpenAI", "TypeScript"],
-    links: {
-    },
-    architecture: {
-      overview: "Dashboard and embeddable widget powered by a realtime Convex backend.",
-      stack: ["Next.js", "Convex", "OpenAI Agent", "Vapi"],
-      decisions: ["Dashboard separated from visitor widget", "Provider security with AES-256-GCM"],
-      scaling: [],
-      tradeoffs: [],
-      challenges: [],
-      lessons: [],
-    }
-  },
-  {
-    id: "forgeflow",
-    name: "ForgeFlow",
-    tagline: "Browser Automation",
-    description: "A collaborative visual workflow builder for browser automation. Compose steps on a shared canvas and run in durable background tasks.",
-    thumbnail: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop",
-    images: [
-      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1558655146-d09347e92766?q=80&w=2070&auto=format&fit=crop",
-    ],
-    status: "Live",
-    technologies: ["Next.js", "React", "TypeScript", "Trigger.dev", "Liveblocks", "Neon", "Clerk"],
-    links: {
-    },
-    architecture: {
-      overview: "Visual workflow engine executing on Trigger.dev driving Stagehand browser sessions.",
-      stack: ["Next.js", "Trigger.dev", "Browserbase", "Liveblocks"],
-      decisions: ["Topological sort execution", "Liveblocks for canvas, Postgres for snapshots"],
       scaling: [],
       tradeoffs: [],
       challenges: [],

@@ -7,7 +7,7 @@ export function ProjectsSection() {
       {projects.map((project) => (
         <div 
           key={project.id} 
-          className="h-screen min-h-screen w-full snap-start snap-always relative flex items-center justify-center p-6 shrink-0"
+          className="h-screen min-h-screen w-full snap-start snap-always relative flex items-center justify-center p-6 pt-24 shrink-0"
         >
           <ProjectCard project={project} />
         </div>
