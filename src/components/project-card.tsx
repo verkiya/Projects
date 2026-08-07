@@ -36,7 +36,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
       <div 
         className="absolute inset-0 blur-[80px] -z-10 rounded-[4rem] scale-95 opacity-40 group-hover:opacity-60 transition-opacity duration-700 mix-blend-screen" 
         style={{ 
-          background: `radial-gradient(circle at 50% 50%, rgba(244, 114, 182, 0.4), transparent 70%)`
+          background: project.glowGradient || `radial-gradient(circle at 50% 50%, ${project.themeColor || '#f472b6'}66, transparent 70%)`
         }}
       />
 
@@ -96,7 +96,10 @@ export function ProjectCard({ project }: ProjectCardProps) {
               maskComposite: 'exclude',
             }}
           >
-            <div className="absolute inset-[-100%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_0deg,transparent_0_75%,#f472b6_100%)] opacity-80" />
+            <div 
+              className="absolute inset-[-100%] animate-[spin_4s_linear_infinite] opacity-80" 
+              style={{ background: project.borderGradient || `conic-gradient(from 0deg, transparent 0 75%, ${project.themeColor || '#f472b6'} 100%)` }} 
+            />
           </div>
 
           {/* Top Details */}
@@ -194,15 +197,18 @@ export function ProjectCard({ project }: ProjectCardProps) {
               maskComposite: 'exclude',
             }}
           >
-            <div className="absolute inset-[-100%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_0deg,transparent_0_75%,#f472b6_100%)] opacity-80" />
+            <div 
+              className="absolute inset-[-100%] animate-[spin_4s_linear_infinite] opacity-80" 
+              style={{ background: project.borderGradient || `conic-gradient(from 0deg, transparent 0 75%, ${project.themeColor || '#f472b6'} 100%)` }} 
+            />
           </div>
 
           <div className="flex-1 w-full h-full relative">
             {isFlipped && (
               <iframe
                 className="absolute inset-0 w-full h-full rounded-[2.5rem]"
-                src={flippedState === 'walkthrough' ? (project.links.video || "https://www.youtube.com/embed/dQw4w9WgXcQ?controls=1&rel=0") : (project.links.demo || "")}
-                title={flippedState === 'walkthrough' ? `${project.name} Demo Video` : `${project.name} Quick Demo`}
+                src={flippedState === 'demo' ? (project.links.video || "https://www.youtube.com/embed/dQw4w9WgXcQ?controls=1&rel=0") : (project.links.demo || "")}
+                title={flippedState === 'demo' ? `${project.name} Quick Demo Video` : `${project.name} Interactive Walkthrough`}
                 allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               />
