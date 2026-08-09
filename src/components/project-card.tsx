@@ -43,14 +43,18 @@ export function ProjectCard({ project }: ProjectCardProps) {
 
 
       {/* Left CTA: Quick Demo */}
-      {project.links.demo && (
+      {(project.links.quickDemo || project.links.demo) && (
         <button
           onClick={() => setFlippedState(flippedState === 'demo' ? 'front' : 'demo')}
-          className="absolute -left-4 md:-left-8 lg:-left-20 top-1/2 -translate-y-1/2 z-50 flex items-center gap-2 rounded-full bg-surface-elevated/95 backdrop-blur-xl border border-border/60 px-3 py-2 md:px-5 md:py-3 shadow-[0_0_40px_-10px_rgba(0,0,0,0.5)] text-text-primary transition-all hover:scale-105 hover:border-white/20 cursor-pointer group"
+          className="absolute -left-4 md:-left-8 lg:-left-20 top-1/2 -translate-y-1/2 z-50 flex items-center gap-2 rounded-full bg-surface-elevated/95 backdrop-blur-xl border border-white/20 px-3 py-2 md:px-5 md:py-3 shadow-[0_0_40px_-10px_rgba(0,0,0,0.5)] text-text-primary transition-all hover:scale-105 hover:border-white/40 cursor-pointer group"
         >
-          {project.icon && (
-            <Image src={project.icon} alt="Icon" width={18} height={18} className="rounded-[4px] bg-white/10 p-0.5" />
-          )}
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            {flippedState === 'demo' ? (
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            ) : (
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            )}
+          </svg>
           <span className="hidden md:inline font-semibold text-sm">{flippedState === 'demo' ? 'Close Demo' : 'Quick Demo'}</span>
         </button>
       )}
@@ -59,20 +63,16 @@ export function ProjectCard({ project }: ProjectCardProps) {
       {project.links.video && (
         <button
           onClick={() => setFlippedState(flippedState === 'walkthrough' ? 'front' : 'walkthrough')}
-          className="absolute -right-4 md:-right-8 lg:-right-20 top-1/2 -translate-y-1/2 z-50 flex items-center gap-2 rounded-full bg-surface-elevated/95 backdrop-blur-xl border border-border/60 px-3 py-2 md:px-5 md:py-3 shadow-[0_0_40px_-10px_rgba(0,0,0,0.5)] text-text-primary transition-all hover:scale-105 hover:border-white/20 cursor-pointer group"
+          className="absolute -right-4 md:-right-8 lg:-right-20 top-1/2 -translate-y-1/2 z-50 flex items-center gap-2 rounded-full bg-surface-elevated/95 backdrop-blur-xl border border-white/20 px-3 py-2 md:px-5 md:py-3 shadow-[0_0_40px_-10px_rgba(0,0,0,0.5)] text-text-primary transition-all hover:scale-105 hover:border-white/40 cursor-pointer group"
         >
           <span className="hidden md:inline font-semibold text-sm">{flippedState === 'walkthrough' ? 'Close Video' : 'Project Walkthrough'}</span>
-          {project.icon ? (
-            <Image src={project.icon} alt="Icon" width={18} height={18} className="rounded-[4px] bg-white/10 p-0.5" />
-          ) : (
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              {flippedState === 'walkthrough' ? (
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-              ) : (
-                <polygon points="5 3 19 12 5 21 5 3" fill="currentColor" stroke="none" />
-              )}
-            </svg>
-          )}
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            {flippedState === 'walkthrough' ? (
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            ) : (
+              <polygon points="5 3 19 12 5 21 5 3" fill="currentColor" stroke="none" />
+            )}
+          </svg>
         </button>
       )}
 
@@ -207,7 +207,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
             {isFlipped && (
               <iframe
                 className="absolute inset-0 w-full h-full rounded-[2.5rem]"
-                src={flippedState === 'demo' ? (project.links.video || "https://www.youtube.com/embed/dQw4w9WgXcQ?controls=1&rel=0") : (project.links.demo || "")}
+                src={flippedState === 'demo' ? (project.links.quickDemo || project.links.demo || "") : (project.links.video || "https://www.youtube.com/embed/dQw4w9WgXcQ?controls=1&rel=0")}
                 title={flippedState === 'demo' ? `${project.name} Quick Demo Video` : `${project.name} Interactive Walkthrough`}
                 allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
@@ -228,31 +228,33 @@ export function ProjectCard({ project }: ProjectCardProps) {
             onClick={() => setSelectedImage(null)}
             className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/95 backdrop-blur-lg cursor-pointer"
           >
+            {/* Close Button Outside */}
+            <button
+              onClick={() => setSelectedImage(null)}
+              className="absolute top-6 right-6 md:top-10 md:right-10 p-3 md:p-4 bg-white/10 hover:bg-white/20 text-white rounded-full backdrop-blur-md transition-all duration-300 hover:scale-110 hover:rotate-90 cursor-pointer border border-white/20 shadow-2xl z-50"
+              aria-label="Close modal"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </button>
+
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="relative w-full h-full cursor-default flex items-center justify-center"
+              className="relative w-[95vw] md:w-[90vw] max-w-6xl aspect-[16/9] cursor-default rounded-2xl overflow-hidden ring-1 ring-white/20 shadow-2xl bg-surface-elevated/40"
               onClick={(e) => e.stopPropagation()}
             >
               <Image
                 src={selectedImage}
                 alt="Enlarged view"
                 fill
-                className="object-contain"
+                className="object-cover"
                 sizes="100vw"
                 quality={100}
               />
-              <button
-                onClick={() => setSelectedImage(null)}
-                className="absolute top-6 right-6 md:top-8 md:right-8 p-3 md:p-4 bg-white/10 hover:bg-white/20 text-white rounded-full backdrop-blur-md transition-colors cursor-pointer border border-white/20 shadow-2xl z-50"
-                aria-label="Close modal"
-              >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M18 6L6 18M6 6l12 12" />
-                </svg>
-              </button>
             </motion.div>
           </motion.div>
         )}

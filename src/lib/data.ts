@@ -17,6 +17,7 @@ export interface Project {
   borderGradient?: string;
   links: {
     demo?: string;
+    quickDemo?: string;
     github?: string;
     architecture?: string;
     video?: string;
@@ -143,8 +144,9 @@ export const projects: Project[] = [
     ],
     links: {
       demo: "https://idecurate.vercel.app/",
+      quickDemo: "https://www.youtube.com/embed/6FlmVEi6KOQ?si=LzyRg_7G0Ae9hDGl",
       github: "https://github.com/verkiya/curate",
-      video: "https://www.youtube.com/embed/FOtoTX-3SSQ?si=0WF0aU5zBJqEud0C"
+      video: "https://www.youtube.com/embed/kqRMQaGJtqk?si=x7ENHF_Oy3eQ0cXe"
     },
     architecture: {
       overview: "An AI-first web IDE built for real-time collaboration and reliable background processing.",
