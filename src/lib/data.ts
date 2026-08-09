@@ -98,7 +98,8 @@ export const projects: Project[] = [
     technologies: ["Next.js", "React", "TypeScript", "Tailwind CSS", "Prisma", "PostgreSQL", "tRPC", "FastAPI", "Clerk", "AWS S3", "Polar SDK", "Sentry", "Zod"],
     links: {
       demo: "https://resonapro.vercel.app",
-      video: "https://www.youtube.com/embed/dOfqpe-P-q0?si=lVOCRxK7BwRo-y92"
+      quickDemo: "https://www.youtube.com/embed/h0urRp9gXrU?si=eY8z6rQy2tBrORlw",
+      video: "https://www.youtube.com/embed/Bt2X_5rsFO0?si=xr5tfJzCoooIWq1J"
     },
     architecture: {
       overview: "Combines self-hosted inference with robust multi-tenant capabilities, metered billing, and secure media delivery.",
