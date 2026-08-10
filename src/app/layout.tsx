@@ -15,7 +15,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Himanshu Verkiya — Full Stack Software Engineer",
+  title: "Portfolio | Himanshu Verkiya",
   description:
     "Full Stack Software Engineer specializing in AI Systems, Developer Tools, and SaaS Platforms. Building production-grade software with modern architecture.",
   keywords: [
@@ -38,13 +38,13 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://verkiya.tech",
     siteName: "Himanshu Verkiya",
-    title: "Himanshu Verkiya — Full Stack Software Engineer",
+    title: "Portfolio | Himanshu Verkiya",
     description:
       "Building AI systems, developer tools, and SaaS platforms.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Himanshu Verkiya — Full Stack Software Engineer",
+    title: "Portfolio | Himanshu Verkiya",
     description:
       "Building AI systems, developer tools, and SaaS platforms.",
   },
@@ -62,7 +62,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${jetbrainsMono.variable} dark snap-y snap-mandatory scroll-smooth`}
+      className={`${inter.variable} ${jetbrainsMono.variable} dark scroll-smooth`}
     >
       <body className="min-h-dvh bg-background text-text-primary antialiased">
         {children}
