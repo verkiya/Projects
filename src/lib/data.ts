@@ -99,6 +99,7 @@ export const projects: Project[] = [
     links: {
       demo: "https://resonapro.vercel.app",
       quickDemo: "https://www.youtube.com/embed/h0urRp9gXrU?si=eY8z6rQy2tBrORlw",
+      github: "https://github.com/verkiya/Resona",
       video: "https://www.youtube.com/embed/Bt2X_5rsFO0?si=xr5tfJzCoooIWq1J"
     },
     architecture: {
@@ -194,6 +195,7 @@ export const projects: Project[] = [
       "Clerk"
     ],
     links: {
+      demo: "https://forgeflowgit.vercel.app",
       quickDemo: "https://www.youtube.com/embed/EFfD9IRcx30?si=qyj0SXRrbn5Nb5bk",
       video: "https://www.youtube.com/embed/DDk5bC6xqmQ",
       github: "https://github.com/verkiya/Forgeflow"
@@ -276,6 +278,7 @@ export const projects: Project[] = [
     borderGradient: "conic-gradient(from 0deg, transparent 0 60%, #7266ff 80%, #a29bfe 100%)",
     technologies: ["Next.js", "Convex", "Clerk", "OpenAI", "Vapi", "Jotai", "Tailwind CSS"],
     links: {
+      demo: "https://vocaliweb.vercel.app",
       github: "https://github.com/verkiya/Vocali",
       quickDemo: "https://www.youtube.com/embed/x9oOgbulqtw",
       video: "https://www.youtube.com/embed/Kzj0nWjRPZs"
