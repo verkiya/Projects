@@ -23,7 +23,7 @@ const brandHexes: Record<string, string> = {
   "FastAPI": "#009688",
   "PostgreSQL": "#336791",
   "Redis": "#F25449",
-  "OpenAI": "#00D19F",
+  "OpenAI": "#ffffff",
   "LangChain": "#45B87D",
   "Docker": "#36A8FF",
   "WebSockets": "#ffffff",
@@ -54,6 +54,8 @@ const brandHexes: Record<string, string> = {
   "Browserbase": "#FF4500",
   "Liveblocks": "#f44e6b",
   "Neon Postgres": "#34D59A",
+  "Vapi": "#0BD8B6",
+  "Jotai": "#ffffff",
 };
 
 export function TechBadge({ name }: TechBadgeProps) {
