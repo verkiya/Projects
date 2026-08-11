@@ -95,7 +95,7 @@ export const projects: Project[] = [
     themeColor: "#f472b6",
     glowGradient: "radial-gradient(circle at 50% 50%, oklch(0.72 0.13 25 / 0.4), transparent 70%)",
     borderGradient: "conic-gradient(from 0deg, transparent 0 60%, oklch(0.72 0.13 25) 80%, oklch(0.75 0.15 300) 100%)",
-    technologies: ["Next.js", "React", "TypeScript", "Tailwind CSS", "Prisma", "PostgreSQL", "tRPC", "FastAPI", "Clerk", "AWS S3", "Polar SDK", "Sentry", "Zod"],
+    technologies: ["Next.js", "React", "TypeScript", "Tailwind CSS", "shadcn/ui", "Prisma", "PostgreSQL", "tRPC", "React Query", "Zod", "Clerk", "Polar", "AWS S3", "FastAPI", "Modal", "Chatterbox TTS", "Framer Motion", "Sentry", "Vercel"],
     links: {
       demo: "https://resonapro.vercel.app",
       quickDemo: "https://www.youtube.com/embed/h0urRp9gXrU?si=eY8z6rQy2tBrORlw",
@@ -138,10 +138,15 @@ export const projects: Project[] = [
       "Tailwind CSS",
       "Convex",
       "Inngest",
+      "WebContainers",
       "Clerk",
       "CodeMirror",
       "Framer Motion",
-      "AI SDK"
+      "AI SDK",
+      "Sentry",
+      "Firecrawl",
+      "React Flow",
+      "Zustand"
     ],
     links: {
       demo: "https://idecurate.vercel.app/",

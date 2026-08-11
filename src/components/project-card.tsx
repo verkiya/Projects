@@ -178,7 +178,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
             transition={{ delay: 0.3 }}
             className="relative z-10 flex flex-col items-center gap-6 px-6 pb-10 pt-16 -mt-8 bg-gradient-to-t from-background via-background/95 to-transparent"
           >
-            <div className="flex flex-nowrap overflow-x-auto justify-start md:justify-center gap-2 w-auto max-w-full px-5 py-2.5 bg-surface-elevated/40 backdrop-blur-md rounded-full border border-border/50 shadow-inner [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="flex flex-wrap justify-center gap-2 w-auto max-w-[95%] md:max-w-[85%] px-5 py-3 bg-surface-elevated/40 backdrop-blur-md rounded-2xl border border-border/50 shadow-inner">
               {project.technologies.map(tech => (
                 <TechBadge key={tech} name={tech} />
               ))}
