@@ -38,7 +38,9 @@ export function Navigation() {
         <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
           {/* Wordmark */}
           <a
-            href="#home"
+            href="https://github.com/verkiya"
+            target="_blank"
+            rel="noopener noreferrer"
             className="font-mono text-sm font-medium tracking-wide text-text-primary transition-colors hover:text-accent"
           >
             Himanshu Verkiya
@@ -49,7 +51,7 @@ export function Navigation() {
             <ul className="hidden items-center gap-3 md:flex">
               <li>
                 <a
-                  href="#home"
+                  href="https://verkiya.vercel.app/"
                   className="flex items-center gap-2 rounded-full border border-border/50 bg-surface/50 px-4 py-2 text-sm font-medium text-text-secondary transition-all hover:bg-surface-elevated hover:text-text-primary hover:border-border hover:shadow-sm"
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -150,7 +152,7 @@ export function Navigation() {
               className="flex h-full flex-col items-center justify-center gap-8"
             >
               <motion.a
-                href="#home"
+                href="https://verkiya.vercel.app/"
                 onClick={() => setMobileOpen(false)}
                 initial={{ y: 16, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
