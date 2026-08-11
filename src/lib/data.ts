@@ -114,7 +114,7 @@ export const projects: Project[] = [
   {
     id: "curate",
     name: "Curate",
-    tagline: "AI-Native Web IDE",
+    tagline: "AI-Native Web IDE — Build software without leaving the web",
     description: "A comprehensive AI-powered web IDE. Features real-time state synchronization, robust background job processing, and in-browser terminal execution for a seamless development experience.",
     thumbnail: "/curate/introduction.png",
     icon: "/curate/icon.png",
