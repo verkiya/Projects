@@ -42,7 +42,7 @@ const brandHexes: Record<string, string> = {
   "Tailwind CSS": "#38BDF8",
   "tRPC": "#2596be",
   "AWS S3": "#FF9900",
-  "Polar SDK": "#ffffff",
+  "Polar": "#ffffff",
   "Sentry": "#8270C4",
   "Zod": "#5C8EE6",
   "Convex": "#FF6B3D",
@@ -56,6 +56,15 @@ const brandHexes: Record<string, string> = {
   "Neon Postgres": "#34D59A",
   "Vapi": "#0BD8B6",
   "Jotai": "#ffffff",
+  "WebContainers": "#ffffff",
+  "Firecrawl": "#FF4F00",
+  "Zustand": "#ffffff",
+  "shadcn/ui": "#ffffff",
+  "React Query": "#FF4154",
+  "Modal": "#ffffff",
+  "Chatterbox TTS": "#FF4F00",
+  "Vercel": "#ffffff",
+  "Better Auth": "#ffffff",
 };
 
 export function TechBadge({ name }: TechBadgeProps) {

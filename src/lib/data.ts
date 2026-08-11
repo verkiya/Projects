@@ -95,10 +95,11 @@ export const projects: Project[] = [
     themeColor: "#f472b6",
     glowGradient: "radial-gradient(circle at 50% 50%, oklch(0.72 0.13 25 / 0.4), transparent 70%)",
     borderGradient: "conic-gradient(from 0deg, transparent 0 60%, oklch(0.72 0.13 25) 80%, oklch(0.75 0.15 300) 100%)",
-    technologies: ["Next.js", "React", "TypeScript", "Tailwind CSS", "Prisma", "PostgreSQL", "tRPC", "FastAPI", "Clerk", "AWS S3", "Polar SDK", "Sentry", "Zod"],
+    technologies: ["Next.js", "React", "TypeScript", "Tailwind CSS", "shadcn/ui", "Prisma", "PostgreSQL", "tRPC", "React Query", "Zod", "Clerk", "Polar", "AWS S3", "FastAPI", "Modal", "Chatterbox TTS", "Framer Motion", "Sentry", "Vercel"],
     links: {
       demo: "https://resonapro.vercel.app",
       quickDemo: "https://www.youtube.com/embed/h0urRp9gXrU?si=eY8z6rQy2tBrORlw",
+      github: "https://github.com/verkiya/Resona",
       video: "https://www.youtube.com/embed/Bt2X_5rsFO0?si=xr5tfJzCoooIWq1J"
     },
     architecture: {
@@ -114,7 +115,7 @@ export const projects: Project[] = [
   {
     id: "curate",
     name: "Curate",
-    tagline: "AI-Native Web IDE",
+    tagline: "AI-Native Web IDE — Build software without leaving the web",
     description: "A comprehensive AI-powered web IDE. Features real-time state synchronization, robust background job processing, and in-browser terminal execution for a seamless development experience.",
     thumbnail: "/curate/introduction.png",
     icon: "/curate/icon.png",
@@ -138,10 +139,15 @@ export const projects: Project[] = [
       "Tailwind CSS",
       "Convex",
       "Inngest",
+      "WebContainers",
       "Clerk",
       "CodeMirror",
       "Framer Motion",
-      "AI SDK"
+      "AI SDK",
+      "Sentry",
+      "Firecrawl",
+      "React Flow",
+      "Zustand"
     ],
     links: {
       demo: "https://idecurate.vercel.app/",
@@ -189,6 +195,7 @@ export const projects: Project[] = [
       "Clerk"
     ],
     links: {
+      demo: "https://forgeflowgit.vercel.app",
       quickDemo: "https://www.youtube.com/embed/EFfD9IRcx30?si=qyj0SXRrbn5Nb5bk",
       video: "https://www.youtube.com/embed/DDk5bC6xqmQ",
       github: "https://github.com/verkiya/Forgeflow"
@@ -271,6 +278,7 @@ export const projects: Project[] = [
     borderGradient: "conic-gradient(from 0deg, transparent 0 60%, #7266ff 80%, #a29bfe 100%)",
     technologies: ["Next.js", "Convex", "Clerk", "OpenAI", "Vapi", "Jotai", "Tailwind CSS"],
     links: {
+      demo: "https://vocaliweb.vercel.app",
       github: "https://github.com/verkiya/Vocali",
       quickDemo: "https://www.youtube.com/embed/x9oOgbulqtw",
       video: "https://www.youtube.com/embed/Kzj0nWjRPZs"
