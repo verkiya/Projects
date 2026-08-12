@@ -46,6 +46,25 @@ export interface NavLink {
   external?: boolean;
 }
 
+export interface VideoNote {
+  title: string;
+  notes?: string;
+  url?: string;
+  videoId?: string;
+}
+
+export interface Channel {
+  name: string;
+  videos: VideoNote[];
+}
+
+export interface Notebook {
+  id: string;
+  title: string;
+  description: string;
+  channels: Channel[];
+}
+
 // ─── Navigation ──────────────────────────────────────────────────────────────
 
 export const navLinks: NavLink[] = [
@@ -292,5 +311,86 @@ export const projects: Project[] = [
       challenges: [],
       lessons: [],
     }
+  }
+];
+
+// ─── Learnings ───────────────────────────────────────────────────────────────
+
+export const learnings: Notebook[] = [
+  {
+    id: "system-design",
+    title: "System Design",
+    description: "Concepts and case studies for building scalable, resilient, and distributed systems.",
+    channels: [
+      {
+        name: "Hello Interview",
+        videos: [
+          { title: "Kafka System Design Deep Dive w/ a Ex-Meta Staff Engineer", url: "https://www.youtube.com/watch?v=DU8o-OTeoCc", videoId: "DU8o-OTeoCc" },
+          { title: "DB Indexing in System Design Interviews - B-tree, Geospatial, Inverted Index, and more!", url: "https://www.youtube.com/watch?v=BHCSL_ZifI0", videoId: "BHCSL_ZifI0" },
+          { title: "Kafka vs RabbitMQ", url: "https://www.youtube.com/watch?v=1HOVtQ-_fcE", videoId: "1HOVtQ-_fcE" },
+          { title: "Message Queues in System Design Interviews w/ Meta Staff Engineer", url: "https://www.youtube.com/watch?v=1ISRd0bS714", videoId: "1ISRd0bS714" },
+          { title: "Distributed Transactions Explained: 2 Phase Commit vs Saga Pattern", url: "https://www.youtube.com/watch?v=DOFflggE_0Q", videoId: "DOFflggE_0Q" },
+          { title: "API Design in System Design Interviews w/ Meta Staff Engineer", url: "https://www.youtube.com/watch?v=DQ57zYedMdQ", videoId: "DQ57zYedMdQ" },
+          { title: "Data Modeling in System Design Interviews w/ Meta Staff Engineer", url: "https://www.youtube.com/watch?v=TUcPS6dsWx4", videoId: "TUcPS6dsWx4" },
+          { title: "Sharding in System Design Interviews w/ Meta Staff Engineer", url: "https://www.youtube.com/watch?v=L521gizea4s", videoId: "L521gizea4s" },
+          { title: "Concurrency in Low-level Design Interviews w/ Staff Engineer", url: "https://www.youtube.com/watch?v=d8rmosXttTE", videoId: "d8rmosXttTE" },
+          { title: "Networking Essentials for System Design Interviews w/ Ex Meta Senior Manager", url: "https://www.youtube.com/watch?v=SHkbPm1Wrno", videoId: "SHkbPm1Wrno" },
+          { title: "Object Storage in System Design Interviews w/ Ex-Meta Staff Engineer", url: "https://www.youtube.com/watch?v=RvaMHMxHjp4", videoId: "RvaMHMxHjp4" },
+          { title: "Consistent Hashing: Easy Explanation for System Design Interviews", url: "https://www.youtube.com/watch?v=vccwdhfqIrI", videoId: "vccwdhfqIrI" },
+          { title: "CAP Theorem in System Design Interviews", url: "https://www.youtube.com/watch?v=VdrEq0cODu4", videoId: "VdrEq0cODu4" },
+          { title: "How to Prepare for System Design Interviews w/ Meta Staff Engineer", url: "https://www.youtube.com/watch?v=Ru54dxzCyD0", videoId: "Ru54dxzCyD0" },
+          { title: "Caching in System Design Interviews w/ Meta Staff Engineer", url: "https://www.youtube.com/watch?v=1NngTUYPdpI", videoId: "1NngTUYPdpI" },
+        ]
+      },
+      {
+        name: "ByteByteGo",
+        videos: [
+          {
+            title: "How to Answer Any System Design Interview Question",
+            notes: "Framework: Understand the goal, propose high-level design, deep dive into components, identify bottlenecks.",
+            url: "https://www.youtube.com/watch?v=bUHFg8CZFws"
+          },
+          {
+            title: "What is Rate Limiting?",
+            notes: "Algorithms: Token bucket, leaking bucket, fixed window counter, sliding window log, sliding window counter.",
+            url: "https://www.youtube.com/watch?v=FU4WlwfS3G0"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "dsa",
+    title: "Data Structures & Algorithms",
+    description: "Deep dives into algorithms and problem-solving patterns.",
+    channels: [
+      {
+        name: "NeetCode",
+        videos: [
+          {
+            title: "Top K Frequent Elements",
+            notes: "Bucket sort approach: O(n) time and space complexity.",
+            url: "https://www.youtube.com/watch?v=YPTqKIgVk-k"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "full-stack",
+    title: "Full Stack Web Development",
+    description: "Notes on modern frameworks, databases, and deployment strategies.",
+    channels: [
+      {
+        name: "Jack Herrington",
+        videos: [
+          {
+            title: "Next.js App Router Authentication",
+            notes: "Using NextAuth / Auth.js with Server Actions and Middleware.",
+            url: "https://www.youtube.com/watch?v=iHj4j6cEQ8Y"
+          }
+        ]
+      }
+    ]
   }
 ];
