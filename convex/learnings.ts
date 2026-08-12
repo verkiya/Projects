@@ -1,4 +1,4 @@
-import { query, mutation } from "./_generated/server";
+import { query, mutation, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
 
 // Query that fetches everything and reconstructs the nested structure for LearningsView
@@ -86,9 +86,9 @@ export const addVideo = mutation({
       });
     }
 
-    // Check for duplicate video in the same notebook
+    // Check for duplicate video in the same notebook (by videoId or title)
     if (args.videoId) {
-      const existing = await ctx.db
+      const existingById = await ctx.db
         .query("videos")
         .filter((q) =>
           q.and(
@@ -97,9 +97,22 @@ export const addVideo = mutation({
           )
         )
         .first();
-      if (existing) {
+      if (existingById) {
         return; // Skip duplicate
       }
+    }
+
+    const existingByTitle = await ctx.db
+      .query("videos")
+      .filter((q) =>
+        q.and(
+          q.eq(q.field("notebookId"), args.notebookId),
+          q.eq(q.field("title"), args.title)
+        )
+      )
+      .first();
+    if (existingByTitle) {
+      return; // Skip duplicate
     }
 
     await ctx.db.insert("videos", {
@@ -166,6 +179,77 @@ export const editVideo = mutation({
   }
 });
 
+export const editNotebook = mutation({
+  args: {
+    id: v.id("notebooks"),
+    title: v.string(),
+    description: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    requireAdmin(identity);
+
+    const notebook = await ctx.db.get(args.id);
+    if (!notebook) throw new Error("Notebook not found.");
+
+    const oldSlug = notebook.id;
+    const newSlug = args.title.trim().toLowerCase().replace(/[\s_]+/g, '-').replace(/[^\w-]+/g, '');
+
+    // Update the notebook document
+    await ctx.db.patch(args.id, {
+      title: args.title,
+      description: args.description,
+      id: newSlug,
+    });
+
+    // If slug changed, cascade to channels and videos
+    if (oldSlug !== newSlug) {
+      const channels = await ctx.db.query("channels")
+        .withIndex("by_notebook_id", q => q.eq("notebookId", oldSlug))
+        .collect();
+      for (const channel of channels) {
+        await ctx.db.patch(channel._id, { notebookId: newSlug });
+      }
+
+      const videos = await ctx.db.query("videos")
+        .filter(q => q.eq(q.field("notebookId"), oldSlug))
+        .collect();
+      for (const video of videos) {
+        await ctx.db.patch(video._id, { notebookId: newSlug });
+      }
+    }
+  }
+});
+
+export const editChannel = mutation({
+  args: {
+    id: v.id("channels"),
+    name: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    requireAdmin(identity);
+
+    const channel = await ctx.db.get(args.id);
+    if (!channel) throw new Error("Channel not found.");
+
+    const oldName = channel.name;
+    const newName = args.name.trim();
+
+    await ctx.db.patch(args.id, { name: newName });
+
+    // Cascade the name change to all videos under this channel
+    if (oldName !== newName) {
+      const videos = await ctx.db.query("videos")
+        .withIndex("by_channel", q => q.eq("notebookId", channel.notebookId).eq("channelName", oldName))
+        .collect();
+      for (const video of videos) {
+        await ctx.db.patch(video._id, { channelName: newName });
+      }
+    }
+  }
+});
+
 export const deleteVideo = mutation({
   args: { id: v.id("videos") },
   handler: async (ctx, args) => {
@@ -215,5 +299,50 @@ export const deleteNotebook = mutation({
       await ctx.db.delete(video._id);
     }
     await ctx.db.delete(args.id);
+  }
+});
+
+export const deduplicateVideos = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    requireAdmin(identity);
+
+    const allVideos = await ctx.db.query("videos").collect();
+    const seen = new Set<string>();
+    let removed = 0;
+
+    for (const video of allVideos) {
+      const key = `${video.notebookId}::${video.title}`;
+      if (seen.has(key)) {
+        await ctx.db.delete(video._id);
+        removed++;
+      } else {
+        seen.add(key);
+      }
+    }
+
+    return { removed };
+  }
+});
+
+export const internalDeduplicateVideos = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const allVideos = await ctx.db.query("videos").collect();
+    const seen = new Set<string>();
+    let removed = 0;
+
+    for (const video of allVideos) {
+      const key = `${video.notebookId}::${video.title}`;
+      if (seen.has(key)) {
+        await ctx.db.delete(video._id);
+        removed++;
+      } else {
+        seen.add(key);
+      }
+    }
+
+    return { removed };
   }
 });

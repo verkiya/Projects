@@ -189,7 +189,8 @@ body {
 /* ─── Scrollbar ───────────────────────────────────────────────────────────── */
 
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 4px;
+  height: 4px;
 }
 
 ::-webkit-scrollbar-track {
@@ -197,12 +198,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-border);
-  border-radius: 3px;
+  background: linear-gradient(to bottom, #ec4899, #a855f7);
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-muted);
+  background: linear-gradient(to bottom, #f472b6, #c084fc);
 }
 
 /* ─── Selection ───────────────────────────────────────────────────────────── */

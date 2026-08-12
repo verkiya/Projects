@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono, Geist } from "next/font/google";
 import "./globals.css";
 import { ConvexClientProvider } from "@/components/convex-client-provider";
+import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
@@ -71,6 +72,7 @@ export default function RootLayout({
       <body className="min-h-dvh bg-background text-text-primary antialiased">
         <ConvexClientProvider>
           {children}
+          <Toaster position="bottom-right" richColors />
         </ConvexClientProvider>
       </body>
     </html>
