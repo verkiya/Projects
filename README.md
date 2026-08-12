@@ -1,8 +1,3 @@
-<div align="center">
-  <h1>Projects</h1>
-</div>
-
-<br />
 
 <div align="center">
   <h2>Curate</h2>
