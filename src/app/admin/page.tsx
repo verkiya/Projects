@@ -5,6 +5,7 @@ import { useMutation, useQuery, useAction } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Navigation } from "@/components/navigation";
 import { UserButton, Show, SignInButton } from "@clerk/nextjs";
+import { fetchLikedVideos } from "../actions/youtube";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,6 +20,84 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+function CategorySelector({ 
+  value, 
+  onChange, 
+  learnings 
+}: { 
+  value: string; 
+  onChange: (val: string) => void; 
+  learnings: any[]; 
+}) {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger
+        className="flex items-center w-full justify-between px-4 py-3 h-[46px] rounded-xl bg-surface border border-white/10 text-text-primary hover:bg-surface/80 font-normal hover:text-white cursor-pointer outline-none text-left"
+      >
+        <span className="truncate">{value || "Ignore (Do not sync)"}</span>
+        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+      </PopoverTrigger>
+      <PopoverContent className="w-[300px] p-0 bg-surface-elevated border-white/10 rounded-xl" align="start">
+        <Command>
+          <CommandInput
+            placeholder="Search or create..."
+            value={search}
+            onValueChange={setSearch}
+            className="text-white h-11"
+          />
+          <CommandList className="max-h-[200px] overflow-y-auto custom-scrollbar">
+            <CommandEmpty className="py-3 text-center text-sm text-text-secondary">
+              No category found.
+            </CommandEmpty>
+            <CommandGroup>
+              <CommandItem
+                value="ignore_do_not_sync"
+                onSelect={() => {
+                  onChange("");
+                  setOpen(false);
+                }}
+                className="text-white hover:bg-white/10 cursor-pointer"
+              >
+                <Check className={cn("mr-2 h-4 w-4", !value ? "opacity-100" : "opacity-0")} />
+                Ignore (Do not sync)
+              </CommandItem>
+              {learnings?.map((n) => (
+                <CommandItem
+                  key={n.id}
+                  value={n.title}
+                  onSelect={() => {
+                    onChange(n.title);
+                    setOpen(false);
+                  }}
+                  className="text-white hover:bg-white/10 cursor-pointer"
+                >
+                  <Check className={cn("mr-2 h-4 w-4", value === n.title ? "opacity-100" : "opacity-0")} />
+                  {n.title}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+            {search && !learnings?.some(n => n.title.toLowerCase() === search.toLowerCase()) && (
+              <div
+                className="p-2 px-4 text-sm cursor-pointer hover:bg-white/10 text-white flex items-center gap-2 border-t border-white/10"
+                onClick={() => {
+                  onChange(search);
+                  setOpen(false);
+                }}
+              >
+                <span className="bg-accent text-black px-1.5 py-0.5 rounded text-[10px] font-bold">NEW</span>
+                Create "{search}"
+              </div>
+            )}
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 export default function AdminPage() {
   const [notebookId, setNotebookId] = useState("");
   const [channelName, setChannelName] = useState("");
@@ -27,9 +106,13 @@ export default function AdminPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // New States for CRUD and Importer
-  const [activeTab, setActiveTab] = useState<"single" | "playlist">("single");
+  const [activeTab, setActiveTab] = useState<"single" | "playlist" | "liked">("single");
   const [playlistUrl, setPlaylistUrl] = useState("");
   const [isImporting, setIsImporting] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [isFetchingLiked, setIsFetchingLiked] = useState(false);
+  const [fetchedLikedVideos, setFetchedLikedVideos] = useState<any[] | null>(null);
+  const [channelCategoryMapping, setChannelCategoryMapping] = useState<Record<string, string>>({});
   const [comboOpen, setComboOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [channelComboOpen, setChannelComboOpen] = useState(false);
@@ -44,6 +127,7 @@ export default function AdminPage() {
   const deleteChannel = useMutation(api.learnings.deleteChannel);
   const deleteNotebook = useMutation(api.learnings.deleteNotebook);
   const editVideo = useMutation(api.learnings.editVideo);
+  const createNotebook = useMutation(api.learnings.createNotebook);
   const importPlaylist = useAction(api.actions.importPlaylist);
 
   const learnings = useQuery(api.learnings.getAllLearnings);
@@ -74,6 +158,14 @@ export default function AdminPage() {
       const finalChannelUrl = fetchedChannelUrl;
       const computedNotebookId = slugify(notebookId);
 
+      if (!learnings?.some(n => n.id === computedNotebookId)) {
+        await createNotebook({
+          id: computedNotebookId,
+          title: notebookId,
+          description: `Videos related to ${notebookId}`
+        });
+      }
+
       await addVideo({
         notebookId: computedNotebookId,
         channelName: finalChannelName,
@@ -98,6 +190,15 @@ export default function AdminPage() {
     setIsImporting(true);
     try {
       const computedNotebookId = slugify(notebookId);
+      
+      if (!learnings?.some(n => n.id === computedNotebookId)) {
+        await createNotebook({
+          id: computedNotebookId,
+          title: notebookId,
+          description: `Videos related to ${notebookId}`
+        });
+      }
+
       const res = await importPlaylist({ playlistUrl, notebookId: computedNotebookId });
       alert(`Successfully imported ${res.count} videos!`);
       setPlaylistUrl("");
@@ -105,6 +206,76 @@ export default function AdminPage() {
       alert("Error importing playlist: " + err.message);
     } finally {
       setIsImporting(false);
+    }
+  };
+
+  const handleFetchLiked = async () => {
+    setIsFetchingLiked(true);
+    try {
+      const videos = await fetchLikedVideos();
+      setFetchedLikedVideos(videos);
+      
+      const initialMapping: Record<string, string> = {};
+      const uniqueChannels = Array.from(new Set(videos.map(v => v.channelName || "Unknown")));
+      
+      uniqueChannels.forEach((channel: any) => {
+        const existingNotebook = learnings?.find(n => n.channels.some((c: any) => c.name === channel));
+        if (existingNotebook) {
+          initialMapping[channel] = existingNotebook.title;
+        }
+      });
+      setChannelCategoryMapping(initialMapping);
+    } catch (err: any) {
+      alert("Error fetching liked videos: " + err.message);
+    } finally {
+      setIsFetchingLiked(false);
+    }
+  };
+
+  const handleSync = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!fetchedLikedVideos) return;
+    
+    setIsSyncing(true);
+    try {
+      let successCount = 0;
+      const createdCategories = new Set<string>();
+
+      for (const video of fetchedLikedVideos) {
+        const channelName = video.channelName || "Unknown";
+        const category = channelCategoryMapping[channelName];
+        if (!category) continue; // Ignore if no category selected
+
+        try {
+          const computedNotebookId = slugify(category);
+          
+          if (!createdCategories.has(computedNotebookId) && !learnings?.some(n => n.id === computedNotebookId)) {
+            await createNotebook({
+              id: computedNotebookId,
+              title: category,
+              description: `Videos related to ${category}`
+            });
+            createdCategories.add(computedNotebookId);
+          }
+
+          await addVideo({
+            notebookId: computedNotebookId,
+            channelName,
+            title: video.title,
+            url: video.url,
+            videoId: video.videoId,
+          });
+          successCount++;
+        } catch (err) {
+          console.error("Error adding video", video.title, err);
+        }
+      }
+      alert(`Successfully synced ${successCount} videos!`);
+      setFetchedLikedVideos(null);
+    } catch (err: any) {
+      alert("Error syncing liked videos: " + err.message);
+    } finally {
+      setIsSyncing(false);
     }
   };
 
@@ -122,11 +293,26 @@ export default function AdminPage() {
     e.preventDefault();
     if (!selectedItem || selectedItem.type !== "video") return;
     try {
+      let newNotebookId = selectedItem.data.notebookId;
+      const newCategoryTitle = selectedItem.data.categoryTitle;
+
+      if (newCategoryTitle) {
+        newNotebookId = slugify(newCategoryTitle);
+        if (!learnings?.some(n => n.id === newNotebookId)) {
+          await createNotebook({
+            id: newNotebookId,
+            title: newCategoryTitle,
+            description: `Videos related to ${newCategoryTitle}`
+          });
+        }
+      }
+
       await editVideo({
         id: selectedItem.data._id,
         title: selectedItem.data.title,
         url: selectedItem.data.url,
         videoId: extractVideoId(selectedItem.data.url),
+        notebookId: newNotebookId,
       });
       setSelectedItem(null);
     } catch (err: any) {
@@ -198,7 +384,7 @@ export default function AdminPage() {
                                 <ol className="flex flex-col gap-1.5 list-decimal list-inside ml-2">
                                   {channel.videos.map(video => (
                                     <li
-                                      key={video.videoId}
+                                      key={video._id}
                                       className="text-sm text-text-secondary hover:text-text-primary transition-colors cursor-pointer py-1 pl-1"
                                       onClick={() => setSelectedItem({ type: "video", data: video })}
                                     >
@@ -227,9 +413,15 @@ export default function AdminPage() {
                   </button>
                   <button
                     onClick={() => setActiveTab("playlist")}
-                    className={`px-4 py-2.5 rounded-xl font-medium cursor-pointer transition-all duration-300 ${activeTab === 'playlist' ? 'bg-[#f472b6] text-black' : 'text-text-secondary hover:text-white hover:bg-white/5'}`}
+                    className={`px-4 py-2.5 mr-2 rounded-xl font-medium cursor-pointer transition-all duration-300 ${activeTab === 'playlist' ? 'bg-[#f472b6] text-black' : 'text-text-secondary hover:text-white hover:bg-white/5'}`}
                   >
                     Import Playlist
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("liked")}
+                    className={`px-4 py-2.5 rounded-xl font-medium cursor-pointer transition-all duration-300 ${activeTab === 'liked' ? 'bg-[#a855f7] text-black' : 'text-text-secondary hover:text-white hover:bg-white/5'}`}
+                  >
+                    Sync Liked Videos
                   </button>
                 </div>
 
@@ -471,6 +663,70 @@ export default function AdminPage() {
                       </form>
                     </>
                   )}
+                  {activeTab === "liked" && (
+                    <div className="relative z-10 flex flex-col gap-6 w-full py-2">
+                      {!fetchedLikedVideos ? (
+                        <div className="flex flex-col gap-6 items-center text-center py-6">
+                          <div className="flex flex-col gap-2 max-w-md">
+                            <h3 className="text-xl font-bold text-white">Sync Liked Videos</h3>
+                            <p className="text-sm text-text-secondary">
+                              This will fetch all videos you liked on YouTube. You will then be able to assign a category for each YouTube channel before syncing them to your database.
+                            </p>
+                          </div>
+                          <Button
+                            onClick={handleFetchLiked}
+                            disabled={isFetchingLiked}
+                            className="h-auto w-full max-w-md px-6 py-3 rounded-xl cursor-pointer bg-surface-elevated/50 backdrop-blur-xl border border-[#a855f7]/30 text-[#a855f7] font-bold hover:bg-[#a855f7]/10 hover:border-[#a855f7] hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                          >
+                            {isFetchingLiked ? (
+                              <>
+                                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                Fetching from YouTube...
+                              </>
+                            ) : "Fetch Liked Videos"}
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col gap-6 w-full">
+                          <div className="flex flex-col gap-1">
+                            <h3 className="text-lg font-bold text-white">Categorize Channels</h3>
+                            <p className="text-sm text-text-secondary">
+                              We found {fetchedLikedVideos.length} liked videos across {Array.from(new Set(fetchedLikedVideos.map(v => v.channelName || "Unknown"))).length} channels. Choose a category for each channel.
+                            </p>
+                          </div>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto custom-scrollbar pr-2">
+                            {Array.from(new Set(fetchedLikedVideos.map(v => v.channelName || "Unknown"))).map(channel => (
+                              <div key={channel} className="flex flex-col gap-2 p-4 rounded-xl bg-surface/50 border border-white/5">
+                                <span className="text-sm font-medium text-white truncate">{channel}</span>
+                                <CategorySelector
+                                  learnings={learnings || []}
+                                  value={channelCategoryMapping[channel] || ""}
+                                  onChange={(val) => setChannelCategoryMapping(prev => ({...prev, [channel]: val}))}
+                                />
+                              </div>
+                            ))}
+                          </div>
+                          
+                          <div className="flex gap-4 pt-4 border-t border-white/10">
+                            <Button
+                              onClick={() => setFetchedLikedVideos(null)}
+                              className="px-6 py-3 rounded-xl bg-surface border border-white/10 text-white font-medium hover:bg-white/5 transition-all"
+                            >
+                              Cancel
+                            </Button>
+                            <Button
+                              onClick={handleSync}
+                              disabled={isSyncing}
+                              className="flex-1 px-6 py-3 rounded-xl cursor-pointer bg-surface-elevated/50 backdrop-blur-xl border border-[#a855f7]/30 text-[#a855f7] font-bold hover:bg-[#a855f7]/10 hover:border-[#a855f7] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            >
+                              {isSyncing ? "Syncing to Database..." : "Sync Selected to Database"}
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -485,6 +741,14 @@ export default function AdminPage() {
 
                   {selectedItem?.type === "video" ? (
                     <form onSubmit={handleEditSubmit} className="flex flex-col gap-6">
+                      <div className="flex flex-col gap-2">
+                        <Label className="text-sm font-medium text-text-secondary">Category</Label>
+                        <CategorySelector
+                          learnings={learnings || []}
+                          value={selectedItem.data.categoryTitle !== undefined ? selectedItem.data.categoryTitle : (learnings?.find(n => n.id === selectedItem.data.notebookId)?.title || selectedItem.data.notebookId)}
+                          onChange={(val) => setSelectedItem({...selectedItem, data: {...selectedItem.data, categoryTitle: val}})}
+                        />
+                      </div>
                       <div className="flex flex-col gap-2">
                         <Label className="text-sm font-medium text-text-secondary">Video Title</Label>
                         <Input

@@ -86,6 +86,22 @@ export const addVideo = mutation({
       });
     }
 
+    // Check for duplicate video in the same notebook
+    if (args.videoId) {
+      const existing = await ctx.db
+        .query("videos")
+        .filter((q) =>
+          q.and(
+            q.eq(q.field("notebookId"), args.notebookId),
+            q.eq(q.field("videoId"), args.videoId)
+          )
+        )
+        .first();
+      if (existing) {
+        return; // Skip duplicate
+      }
+    }
+
     await ctx.db.insert("videos", {
       notebookId: args.notebookId,
       channelName: args.channelName,
@@ -133,15 +149,20 @@ export const editVideo = mutation({
     title: v.string(),
     url: v.string(),
     videoId: v.optional(v.string()),
+    notebookId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     requireAdmin(identity);
-    await ctx.db.patch(args.id, {
+    const patchData: any = {
       title: args.title,
       url: args.url,
       videoId: args.videoId,
-    });
+    };
+    if (args.notebookId !== undefined) {
+      patchData.notebookId = args.notebookId;
+    }
+    await ctx.db.patch(args.id, patchData);
   }
 });
 

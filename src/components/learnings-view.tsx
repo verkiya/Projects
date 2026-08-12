@@ -71,7 +71,7 @@ export function LearningsView() {
                   setActiveNotebookId(notebook.id);
                   setActiveChannelName(notebook.channels[0].name);
                 }}
-                className={`text-lg font-bold text-left transition-colors ${activeNotebookId === notebook.id ? "text-accent" : "text-text-primary hover:text-text-primary/80"}`}
+                className={`text-lg font-bold text-left cursor-pointer transition-colors ${activeNotebookId === notebook.id ? "text-accent" : "text-text-primary hover:text-text-primary/80"}`}
               >
                 {notebook.title}
               </button>
@@ -88,7 +88,7 @@ export function LearningsView() {
                         <button
                           key={channel.name}
                           onClick={() => setActiveChannelName(channel.name)}
-                          className={`text-sm text-left transition-all py-1.5 px-3 rounded-lg flex items-center justify-between ${activeChannelName === channel.name ? "bg-white/10 font-medium" : "text-text-secondary hover:bg-white/5"}`}
+                          className={`text-sm text-left cursor-pointer transition-all py-1.5 px-3 rounded-lg flex items-center justify-between ${activeChannelName === channel.name ? "bg-white/10 font-medium" : "text-text-secondary hover:bg-white/5"}`}
                         >
                           <span className={activeChannelName === channel.name ? `text-transparent bg-clip-text animate-gradient bg-gradient-to-r ${getChannelGradient(channel.name)}` : ""}>
                             {channel.name}
