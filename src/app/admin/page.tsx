@@ -145,14 +145,13 @@ export default function AdminPage() {
         </div>
 
         <div className="w-full max-w-[1600px] xl:px-12 relative z-10 flex flex-col gap-8">
-          <div className="flex items-center justify-between">
-            <h1 className="text-4xl font-bold text-text-primary">Admin Dashboard</h1>
+          <div className="flex items-center justify-end">
             <Show when="signed-in">
-              <UserButton appearance={{ elements: { avatarBox: "w-12 h-12" } }} />
+              <UserButton appearance={{ elements: { userButtonAvatarBox: "w-20 h-20" } }} />
             </Show>
             <Show when="signed-out">
               <SignInButton mode="modal">
-                <button className="px-4 py-2 bg-accent rounded-full text-white font-medium">
+                <button className="px-6 py-2 rounded-full cursor-pointer bg-surface-elevated/50 backdrop-blur-xl border border-white/20 text-white font-medium hover:bg-white/10 hover:border-white/40 hover:scale-105 transition-all duration-300">
                   Sign In
                 </button>
               </SignInButton>
@@ -163,7 +162,7 @@ export default function AdminPage() {
             <div className="flex flex-col gap-10 items-stretch w-full">
 
               {/* Database Overview */}
-              <div className="p-10 rounded-[2.5rem] border border-white/10 bg-surface-elevated/40 backdrop-blur-3xl shadow-2xl relative overflow-hidden flex flex-col min-h-[500px] order-2 w-full">
+              <div className="p-10 rounded-[2.5rem] border border-white/10 bg-surface-elevated/40 backdrop-blur-3xl relative overflow-hidden flex flex-col min-h-[500px] order-2 w-full">
                 <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/10 blur-[80px] rounded-full pointer-events-none" />
                 <h2 className="text-3xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-white to-white/60 relative z-10 shrink-0">Database Overview</h2>
 
@@ -183,8 +182,8 @@ export default function AdminPage() {
                             className="text-xl font-bold text-accent flex items-baseline gap-2 mb-4 cursor-pointer hover:text-white transition-colors w-fit"
                             onClick={() => setSelectedItem({ type: "notebook", data: notebook })}
                           >
-                            {notebook.id}
-                            <span className="text-sm font-normal text-text-secondary">({notebook.title})</span>
+                            {notebook.title}
+                            <span className="text-sm font-normal text-text-secondary">({notebook.id})</span>
                           </h3>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-l-2 border-white/10 pl-4 ml-2">
                             {notebook.channels.map(channel => (
@@ -222,24 +221,24 @@ export default function AdminPage() {
                 <div className="flex bg-surface-elevated/40 p-1 rounded-2xl border border-white/10 backdrop-blur-xl w-fit relative z-10">
                   <button
                     onClick={() => setActiveTab("single")}
-                    className={`px-4 py-2.5 p-2 mr-2 rounded-xl font-medium cursor-pointer transition-all duration-300 ${activeTab === 'single' ? 'bg-accent text-black shadow-lg' : 'text-text-secondary hover:text-white hover:bg-white/5'}`}
+                    className={`px-4 py-2.5 p-2 mr-2 rounded-xl font-medium cursor-pointer transition-all duration-300 ${activeTab === 'single' ? 'bg-emerald-400 text-black' : 'text-text-secondary hover:text-white hover:bg-white/5'}`}
                   >
                     Add Single Video
                   </button>
                   <button
                     onClick={() => setActiveTab("playlist")}
-                    className={`px-4 py-2.5 rounded-xl font-medium cursor-pointer transition-all duration-300 ${activeTab === 'playlist' ? 'bg-accent text-black shadow-lg' : 'text-text-secondary hover:text-white hover:bg-white/5'}`}
+                    className={`px-4 py-2.5 rounded-xl font-medium cursor-pointer transition-all duration-300 ${activeTab === 'playlist' ? 'bg-[#f472b6] text-black' : 'text-text-secondary hover:text-white hover:bg-white/5'}`}
                   >
                     Import Playlist
                   </button>
                 </div>
 
-                <div className="p-8 rounded-[2.5rem] border border-white/10 bg-surface-elevated/40 backdrop-blur-3xl shadow-[0_0_80px_rgba(168,255,83,0.05)] relative overflow-hidden">
+                <div className="p-8 rounded-[2.5rem] border border-white/10 bg-surface-elevated/40 backdrop-blur-3xl relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-64 h-64 bg-accent/10 blur-[80px] rounded-full pointer-events-none" />
 
                   {activeTab === "single" ? (
                     <>
-                      <h2 className="text-3xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-white to-white/60">Add New Video</h2>
+
                       <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10 items-end">
                         <div className="flex flex-col gap-2">
                           <Label className="text-sm font-medium text-text-secondary">Category</Label>
@@ -252,8 +251,8 @@ export default function AdminPage() {
                             </PopoverTrigger>
                             <PopoverContent className="w-[300px] p-0 bg-surface-elevated border-white/10 rounded-xl" align="start">
                               <Command>
-                                <CommandInput 
-                                  placeholder="Search or create..." 
+                                <CommandInput
+                                  placeholder="Search or create..."
                                   value={search}
                                   onValueChange={setSearch}
                                   className="text-white h-11"
@@ -284,7 +283,7 @@ export default function AdminPage() {
                                     ))}
                                   </CommandGroup>
                                   {search && !learnings?.some(n => n.title.toLowerCase() === search.toLowerCase()) && (
-                                    <div 
+                                    <div
                                       className="p-2 px-4 text-sm cursor-pointer hover:bg-white/10 text-white flex items-center gap-2 border-t border-white/10"
                                       onClick={() => {
                                         setNotebookId(search);
@@ -312,8 +311,8 @@ export default function AdminPage() {
                             </PopoverTrigger>
                             <PopoverContent className="w-[300px] p-0 bg-surface-elevated border-white/10 rounded-xl" align="start">
                               <Command>
-                                <CommandInput 
-                                  placeholder="Search or create..." 
+                                <CommandInput
+                                  placeholder="Search or create..."
                                   value={channelSearch}
                                   onValueChange={setChannelSearch}
                                   className="text-white h-11"
@@ -344,7 +343,7 @@ export default function AdminPage() {
                                     ))}
                                   </CommandGroup>
                                   {channelSearch && !uniqueChannels.some(c => c.toLowerCase() === channelSearch.toLowerCase()) && (
-                                    <div 
+                                    <div
                                       className="p-2 px-4 text-sm cursor-pointer hover:bg-white/10 text-white flex items-center gap-2 border-t border-white/10"
                                       onClick={() => {
                                         setChannelName(channelSearch);
@@ -375,7 +374,7 @@ export default function AdminPage() {
                         <Button
                           type="submit"
                           disabled={isSubmitting}
-                          className="h-auto w-full px-6 py-3 rounded-xl cursor-pointer bg-gradient-to-r from-accent to-emerald-400 text-black font-bold hover:shadow-[0_0_30px_rgba(168,255,83,0.3)] hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:hover:scale-100 disabled:hover:shadow-none disabled:cursor-not-allowed"
+                          className="h-auto w-full px-6 py-3 rounded-xl cursor-pointer bg-surface-elevated/50 backdrop-blur-xl border border-emerald-400/30 text-emerald-400 font-bold hover:bg-emerald-400/10 hover:border-emerald-400 hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed"
                         >
                           {isSubmitting ? "Adding..." : "Add to Portfolio"}
                         </Button>
@@ -383,7 +382,7 @@ export default function AdminPage() {
                     </>
                   ) : (
                     <>
-                      <h2 className="text-3xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-white to-white/60">Import Playlist</h2>
+
                       <form onSubmit={handleImport} className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10 items-end">
                         <div className="flex flex-col gap-2">
                           <Label className="text-sm font-medium text-text-secondary">Category</Label>
@@ -396,8 +395,8 @@ export default function AdminPage() {
                             </PopoverTrigger>
                             <PopoverContent className="w-[300px] p-0 bg-surface-elevated border-white/10 rounded-xl" align="start">
                               <Command>
-                                <CommandInput 
-                                  placeholder="Search or create..." 
+                                <CommandInput
+                                  placeholder="Search or create..."
                                   value={search}
                                   onValueChange={setSearch}
                                   className="text-white h-11"
@@ -428,7 +427,7 @@ export default function AdminPage() {
                                     ))}
                                   </CommandGroup>
                                   {search && !learnings?.some(n => n.title.toLowerCase() === search.toLowerCase()) && (
-                                    <div 
+                                    <div
                                       className="p-2 px-4 text-sm cursor-pointer hover:bg-white/10 text-white flex items-center gap-2 border-t border-white/10"
                                       onClick={() => {
                                         setNotebookId(search);
@@ -460,7 +459,7 @@ export default function AdminPage() {
                         <Button
                           type="submit"
                           disabled={isImporting}
-                          className="h-auto w-full px-6 py-3 rounded-xl cursor-pointer bg-gradient-to-r from-[#f472b6] to-purple-500 text-white font-bold hover:shadow-[0_0_30px_rgba(244,114,182,0.3)] hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:hover:scale-100 disabled:hover:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                          className="h-auto w-full px-6 py-3 rounded-xl cursor-pointer bg-surface-elevated/50 backdrop-blur-xl border border-[#f472b6]/30 text-[#f472b6] font-bold hover:bg-[#f472b6]/10 hover:border-[#f472b6] hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
                           {isImporting ? (
                             <>
