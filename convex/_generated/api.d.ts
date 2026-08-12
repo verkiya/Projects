@@ -9,6 +9,7 @@
  */
 
 import type * as actions from "../actions.js";
+import type * as crons from "../crons.js";
 import type * as learnings from "../learnings.js";
 import type * as seed from "../seed.js";
 
@@ -20,6 +21,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   actions: typeof actions;
+  crons: typeof crons;
   learnings: typeof learnings;
   seed: typeof seed;
 }>;

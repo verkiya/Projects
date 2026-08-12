@@ -17,17 +17,18 @@ import {
 } from "@/components/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
-function CategorySelector({ 
-  value, 
-  onChange, 
-  learnings 
-}: { 
-  value: string; 
-  onChange: (val: string) => void; 
-  learnings: any[]; 
+function CategorySelector({
+  value,
+  onChange,
+  learnings
+}: {
+  value: string;
+  onChange: (val: string) => void;
+  learnings: any[];
 }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -127,7 +128,10 @@ export default function AdminPage() {
   const deleteChannel = useMutation(api.learnings.deleteChannel);
   const deleteNotebook = useMutation(api.learnings.deleteNotebook);
   const editVideo = useMutation(api.learnings.editVideo);
+  const editNotebook = useMutation(api.learnings.editNotebook);
+  const editChannel = useMutation(api.learnings.editChannel);
   const createNotebook = useMutation(api.learnings.createNotebook);
+  const deduplicateVideos = useMutation(api.learnings.deduplicateVideos);
   const importPlaylist = useAction(api.actions.importPlaylist);
 
   const learnings = useQuery(api.learnings.getAllLearnings);
@@ -174,12 +178,12 @@ export default function AdminPage() {
         url,
         videoId: extractVideoId(url),
       });
-      alert(`Video '${videoTitle}' added successfully!`);
+      toast.success(`Video '${videoTitle}' added successfully!`);
       setUrl("");
       // Keep category and channel details for quick consecutive additions
       if (!channelName) setChannelName(finalChannelName);
     } catch (err: any) {
-      alert("Error adding video: " + err.message);
+      toast.error("Error adding video", { description: err.message });
     } finally {
       setIsSubmitting(false);
     }
@@ -190,7 +194,7 @@ export default function AdminPage() {
     setIsImporting(true);
     try {
       const computedNotebookId = slugify(notebookId);
-      
+
       if (!learnings?.some(n => n.id === computedNotebookId)) {
         await createNotebook({
           id: computedNotebookId,
@@ -200,10 +204,10 @@ export default function AdminPage() {
       }
 
       const res = await importPlaylist({ playlistUrl, notebookId: computedNotebookId });
-      alert(`Successfully imported ${res.count} videos!`);
+      toast.success(`Successfully imported ${res.count} videos!`);
       setPlaylistUrl("");
     } catch (err: any) {
-      alert("Error importing playlist: " + err.message);
+      toast.error("Error importing playlist", { description: err.message });
     } finally {
       setIsImporting(false);
     }
@@ -214,10 +218,10 @@ export default function AdminPage() {
     try {
       const videos = await fetchLikedVideos();
       setFetchedLikedVideos(videos);
-      
+
       const initialMapping: Record<string, string> = {};
       const uniqueChannels = Array.from(new Set(videos.map(v => v.channelName || "Unknown")));
-      
+
       uniqueChannels.forEach((channel: any) => {
         const existingNotebook = learnings?.find(n => n.channels.some((c: any) => c.name === channel));
         if (existingNotebook) {
@@ -226,7 +230,7 @@ export default function AdminPage() {
       });
       setChannelCategoryMapping(initialMapping);
     } catch (err: any) {
-      alert("Error fetching liked videos: " + err.message);
+      toast.error("Error fetching liked videos", { description: err.message });
     } finally {
       setIsFetchingLiked(false);
     }
@@ -235,7 +239,7 @@ export default function AdminPage() {
   const handleSync = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!fetchedLikedVideos) return;
-    
+
     setIsSyncing(true);
     try {
       let successCount = 0;
@@ -248,7 +252,7 @@ export default function AdminPage() {
 
         try {
           const computedNotebookId = slugify(category);
-          
+
           if (!createdCategories.has(computedNotebookId) && !learnings?.some(n => n.id === computedNotebookId)) {
             await createNotebook({
               id: computedNotebookId,
@@ -270,28 +274,37 @@ export default function AdminPage() {
           console.error("Error adding video", video.title, err);
         }
       }
-      alert(`Successfully synced ${successCount} videos!`);
+      toast.success(`Successfully synced ${successCount} videos!`);
       setFetchedLikedVideos(null);
     } catch (err: any) {
-      alert("Error syncing liked videos: " + err.message);
+      toast.error("Error syncing liked videos", { description: err.message });
     } finally {
       setIsSyncing(false);
     }
   };
 
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isDeduping, setIsDeduping] = useState(false);
+
   const handleDelete = async (type: "video" | "channel" | "notebook", id: string) => {
+    setIsDeleting(true);
     try {
       if (type === "video") await deleteVideo({ id: id as any });
       if (type === "channel") await deleteChannel({ id: id as any });
       if (type === "notebook") await deleteNotebook({ id: id as any });
+      toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} deleted successfully`);
     } catch (err: any) {
-      alert("Error deleting: " + err.message);
+      toast.error(`Error deleting ${type}`, { description: err.message });
+    } finally {
+      setIsDeleting(false);
     }
   };
 
   const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedItem || selectedItem.type !== "video") return;
+    setIsEditing(true);
     try {
       let newNotebookId = selectedItem.data.notebookId;
       const newCategoryTitle = selectedItem.data.categoryTitle;
@@ -314,9 +327,12 @@ export default function AdminPage() {
         videoId: extractVideoId(selectedItem.data.url),
         notebookId: newNotebookId,
       });
+      toast.success("Video updated successfully");
       setSelectedItem(null);
     } catch (err: any) {
-      alert("Error editing video: " + err.message);
+      toast.error("Error editing video", { description: err.message });
+    } finally {
+      setIsEditing(false);
     }
   };
 
@@ -350,7 +366,31 @@ export default function AdminPage() {
               {/* Database Overview */}
               <div className="p-10 rounded-[2.5rem] border border-white/10 bg-surface-elevated/40 backdrop-blur-3xl relative overflow-hidden flex flex-col min-h-[500px] order-2 w-full">
                 <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/10 blur-[80px] rounded-full pointer-events-none" />
-                <h2 className="text-3xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-white to-white/60 relative z-10 shrink-0">Database Overview</h2>
+                <div className="flex items-center justify-between mb-6 relative z-10 shrink-0">
+                  <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-white/60">Database Overview</h2>
+                  <Button
+                    onClick={async () => {
+                      setIsDeduping(true);
+                      try {
+                        const res = await deduplicateVideos();
+                        if (res.removed > 0) {
+                          toast.success(`Removed ${res.removed} duplicate${res.removed > 1 ? 's' : ''}`);
+                        } else {
+                          toast.info("No duplicates found");
+                        }
+                      } catch (err: any) {
+                        toast.error("Error deduplicating", { description: err.message });
+                      } finally {
+                        setIsDeduping(false);
+                      }
+                    }}
+                    disabled={isDeduping}
+                    className="h-auto px-4 py-2 rounded-xl cursor-pointer bg-surface-elevated/50 backdrop-blur-xl border border-amber-400/30 text-amber-400 text-sm font-medium hover:bg-amber-400/10 hover:border-amber-400 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  >
+                    {isDeduping && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                    {isDeduping ? "Scanning..." : "Remove Duplicates"}
+                  </Button>
+                </div>
 
                 <div className="overflow-y-auto pr-4 relative z-10 flex-1 custom-scrollbar">
                   {learnings === undefined ? (
@@ -566,8 +606,9 @@ export default function AdminPage() {
                         <Button
                           type="submit"
                           disabled={isSubmitting}
-                          className="h-auto w-full px-6 py-3 rounded-xl cursor-pointer bg-surface-elevated/50 backdrop-blur-xl border border-emerald-400/30 text-emerald-400 font-bold hover:bg-emerald-400/10 hover:border-emerald-400 hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed"
+                          className="h-auto w-full px-6 py-3 rounded-xl cursor-pointer bg-surface-elevated/50 backdrop-blur-xl border border-emerald-400/30 text-emerald-400 font-bold hover:bg-emerald-400/10 hover:border-emerald-400 hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
+                          {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
                           {isSubmitting ? "Adding..." : "Add to Portfolio"}
                         </Button>
                       </form>
@@ -651,7 +692,7 @@ export default function AdminPage() {
                         <Button
                           type="submit"
                           disabled={isImporting}
-                          className="h-auto w-full px-6 py-3 rounded-xl cursor-pointer bg-surface-elevated/50 backdrop-blur-xl border border-[#f472b6]/30 text-[#f472b6] font-bold hover:bg-[#f472b6]/10 hover:border-[#f472b6] hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                          className="h-auto w-full px-6 py-3 rounded-xl cursor-pointer bg-surface-elevated/50 backdrop-blur-xl border border-[#a855f7]/30 text-[#a855f7] font-bold hover:bg-[#a855f7]/10 hover:border-[#a855f7] hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
                           {isImporting ? (
                             <>
@@ -694,7 +735,7 @@ export default function AdminPage() {
                               We found {fetchedLikedVideos.length} liked videos across {Array.from(new Set(fetchedLikedVideos.map(v => v.channelName || "Unknown"))).length} channels. Choose a category for each channel.
                             </p>
                           </div>
-                          
+
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto custom-scrollbar pr-2">
                             {Array.from(new Set(fetchedLikedVideos.map(v => v.channelName || "Unknown"))).map(channel => (
                               <div key={channel} className="flex flex-col gap-2 p-4 rounded-xl bg-surface/50 border border-white/5">
@@ -707,18 +748,18 @@ export default function AdminPage() {
                               </div>
                             ))}
                           </div>
-                          
-                          <div className="flex gap-4 pt-4 border-t border-white/10">
+
+                          <div className="flex gap-4 pt-4  border-t border-white/10">
                             <Button
                               onClick={() => setFetchedLikedVideos(null)}
-                              className="px-6 py-3 rounded-xl bg-surface border border-white/10 text-white font-medium hover:bg-white/5 transition-all"
+                              className="px-6 py-3 h-12! rounded-xl bg-surface border border-white/10 text-white font-medium hover:bg-white/5 transition-all"
                             >
                               Cancel
                             </Button>
                             <Button
                               onClick={handleSync}
                               disabled={isSyncing}
-                              className="flex-1 px-6 py-3 rounded-xl cursor-pointer bg-surface-elevated/50 backdrop-blur-xl border border-[#a855f7]/30 text-[#a855f7] font-bold hover:bg-[#a855f7]/10 hover:border-[#a855f7] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                              className="flex-1 px-6 py-3 h-12! rounded-xl cursor-pointer bg-surface-elevated/50 backdrop-blur-xl border border-[#a855f7]/30 text-[#a855f7] font-bold hover:bg-[#a855f7]/10 hover:border-[#a855f7] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                             >
                               {isSyncing ? "Syncing to Database..." : "Sync Selected to Database"}
                             </Button>
@@ -770,24 +811,103 @@ export default function AdminPage() {
                         />
                       </div>
                       <div className="flex justify-between items-center mt-2">
-                        <Button type="button" variant="destructive" onClick={() => { handleDelete("video", selectedItem.data._id); setSelectedItem(null); }} className="rounded-xl cursor-pointer font-medium h-auto py-3">Delete</Button>
+                        <Button type="button" variant="destructive" disabled={isDeleting} onClick={() => { handleDelete("video", selectedItem.data._id).then(() => setSelectedItem(null)); }} className="rounded-xl cursor-pointer font-medium h-auto py-3 flex items-center gap-2">
+                          {isDeleting && <Loader2 className="h-4 w-4 animate-spin" />}
+                          {isDeleting ? "Deleting..." : "Delete"}
+                        </Button>
                         <div className="flex gap-4">
                           <Button type="button" variant="ghost" onClick={() => setSelectedItem(null)} className="rounded-xl cursor-pointer text-text-secondary hover:text-white hover:bg-white/5 h-auto py-3">Cancel</Button>
-                          <Button type="submit" className="rounded-xl cursor-pointer bg-accent text-black font-bold hover:bg-accent/90 h-auto py-3 px-6">Save Changes</Button>
+                          <Button type="submit" disabled={isEditing} className="rounded-xl cursor-pointer bg-accent text-black font-bold hover:bg-accent/90 h-auto py-3 px-6 flex items-center gap-2">
+                            {isEditing && <Loader2 className="h-4 w-4 animate-spin" />}
+                            {isEditing ? "Saving..." : "Save Changes"}
+                          </Button>
                         </div>
                       </div>
                     </form>
-                  ) : (
-                    <div className="flex flex-col gap-6">
-                      <p className="text-text-secondary">
-                        You can delete this {selectedItem?.type} and all its contents from the database.
-                      </p>
-                      <div className="flex justify-between items-center mt-2">
-                        <Button type="button" variant="destructive" onClick={() => { handleDelete(selectedItem?.type as any, selectedItem?.data._id); setSelectedItem(null); }} className="rounded-xl cursor-pointer font-medium h-auto py-3">Delete {selectedItem?.type}</Button>
-                        <Button type="button" variant="ghost" onClick={() => setSelectedItem(null)} className="rounded-xl cursor-pointer text-text-secondary hover:text-white hover:bg-white/5 h-auto py-3 px-6">Cancel</Button>
+                  ) : selectedItem?.type === "notebook" ? (
+                    <form onSubmit={async (e) => {
+                      e.preventDefault();
+                      setIsEditing(true);
+                      try {
+                        await editNotebook({
+                          id: selectedItem.data._id,
+                          title: selectedItem.data.title,
+                          description: selectedItem.data.description,
+                        });
+                        toast.success("Category renamed successfully");
+                        setSelectedItem(null);
+                      } catch (err: any) {
+                        toast.error("Error editing category", { description: err.message });
+                      } finally {
+                        setIsEditing(false);
+                      }
+                    }} className="flex flex-col gap-6">
+                      <div className="flex flex-col gap-2">
+                        <Label className="text-sm font-medium text-text-secondary">Category Name</Label>
+                        <Input
+                          required
+                          type="text"
+                          value={selectedItem.data.title}
+                          onChange={e => setSelectedItem({...selectedItem, data: {...selectedItem.data, title: e.target.value}})}
+                          className="px-4 py-3 rounded-xl bg-surface border border-white/10 focus-visible:ring-accent outline-none text-text-primary transition-colors h-auto"
+                        />
                       </div>
-                    </div>
-                  )}
+                      <div className="flex justify-between items-center mt-2">
+                        <Button type="button" variant="destructive" disabled={isDeleting} onClick={() => { handleDelete("notebook", selectedItem.data._id).then(() => setSelectedItem(null)); }} className="rounded-xl cursor-pointer font-medium h-auto py-3 flex items-center gap-2">
+                          {isDeleting && <Loader2 className="h-4 w-4 animate-spin" />}
+                          {isDeleting ? "Deleting..." : "Delete Category"}
+                        </Button>
+                        <div className="flex gap-4">
+                          <Button type="button" variant="ghost" onClick={() => setSelectedItem(null)} className="rounded-xl cursor-pointer text-text-secondary hover:text-white hover:bg-white/5 h-auto py-3">Cancel</Button>
+                          <Button type="submit" disabled={isEditing} className="rounded-xl cursor-pointer bg-accent text-black font-bold hover:bg-accent/90 h-auto py-3 px-6 flex items-center gap-2">
+                            {isEditing && <Loader2 className="h-4 w-4 animate-spin" />}
+                            {isEditing ? "Saving..." : "Save Changes"}
+                          </Button>
+                        </div>
+                      </div>
+                    </form>
+                  ) : selectedItem?.type === "channel" ? (
+                    <form onSubmit={async (e) => {
+                      e.preventDefault();
+                      setIsEditing(true);
+                      try {
+                        await editChannel({
+                          id: selectedItem.data._id,
+                          name: selectedItem.data.name,
+                        });
+                        toast.success("Channel renamed successfully");
+                        setSelectedItem(null);
+                      } catch (err: any) {
+                        toast.error("Error editing channel", { description: err.message });
+                      } finally {
+                        setIsEditing(false);
+                      }
+                    }} className="flex flex-col gap-6">
+                      <div className="flex flex-col gap-2">
+                        <Label className="text-sm font-medium text-text-secondary">Channel Name</Label>
+                        <Input
+                          required
+                          type="text"
+                          value={selectedItem.data.name}
+                          onChange={e => setSelectedItem({...selectedItem, data: {...selectedItem.data, name: e.target.value}})}
+                          className="px-4 py-3 rounded-xl bg-surface border border-white/10 focus-visible:ring-accent outline-none text-text-primary transition-colors h-auto"
+                        />
+                      </div>
+                      <div className="flex justify-between items-center mt-2">
+                        <Button type="button" variant="destructive" disabled={isDeleting} onClick={() => { handleDelete("channel", selectedItem.data._id).then(() => setSelectedItem(null)); }} className="rounded-xl cursor-pointer font-medium h-auto py-3 flex items-center gap-2">
+                          {isDeleting && <Loader2 className="h-4 w-4 animate-spin" />}
+                          {isDeleting ? "Deleting..." : "Delete Channel"}
+                        </Button>
+                        <div className="flex gap-4">
+                          <Button type="button" variant="ghost" onClick={() => setSelectedItem(null)} className="rounded-xl cursor-pointer text-text-secondary hover:text-white hover:bg-white/5 h-auto py-3">Cancel</Button>
+                          <Button type="submit" disabled={isEditing} className="rounded-xl cursor-pointer bg-accent text-black font-bold hover:bg-accent/90 h-auto py-3 px-6 flex items-center gap-2">
+                            {isEditing && <Loader2 className="h-4 w-4 animate-spin" />}
+                            {isEditing ? "Saving..." : "Save Changes"}
+                          </Button>
+                        </div>
+                      </div>
+                    </form>
+                  ) : null}
               </DialogContent>
             </Dialog>
           </Show>
