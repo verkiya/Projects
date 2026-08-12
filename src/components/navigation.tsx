@@ -52,8 +52,8 @@ export function Navigation() {
                   href="/"
                   className="flex items-center gap-2 rounded-full border border-teal-400/50 bg-surface/50 px-4 py-2 text-sm font-medium text-teal-400 shadow-sm shadow-teal-400/20 transition-all hover:bg-surface-elevated hover:scale-105"
                 >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                  Home
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></svg>
+                  Projects
                 </a>
               </li>
 
@@ -70,13 +70,23 @@ export function Navigation() {
               </li>
               <li>
                 <a
-                  href="https://linkedin.com/in/himanshuverkiya"
+                  href="https://linkedin.com/in/hiverkiya"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 rounded-full border border-sky-400/50 bg-surface/50 px-4 py-2 text-sm font-medium text-sky-400 shadow-sm shadow-sky-400/20 transition-all hover:bg-surface-elevated hover:scale-105"
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
                   LinkedIn
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://x.com/hiverkiya"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 rounded-full border border-neutral-400/50 bg-surface/50 px-4 py-2 text-sm font-medium text-neutral-300 shadow-sm shadow-neutral-400/20 transition-all hover:bg-surface-elevated hover:scale-105"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4l11.733 16h4.267l-11.733 -16z" /><path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772" /></svg>
                 </a>
               </li>
               <li>
@@ -167,8 +177,8 @@ export function Navigation() {
                 transition={{ delay: 0.1 }}
                 className="text-2xl font-light text-text-secondary transition-colors hover:text-text-primary flex items-center gap-3"
               >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                Home
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></svg>
+                Projects
               </motion.a>
 
               <motion.a
@@ -185,7 +195,7 @@ export function Navigation() {
                 GitHub
               </motion.a>
               <motion.a
-                href="https://linkedin.com/in/himanshuverkiya"
+                href="https://linkedin.com/in/hiverkiya"
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setMobileOpen(false)}
@@ -196,6 +206,18 @@ export function Navigation() {
               >
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
                 LinkedIn
+              </motion.a>
+              <motion.a
+                href="https://x.com/hiverkiya"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setMobileOpen(false)}
+                initial={{ y: 16, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.22 }}
+                className="text-2xl font-light text-neutral-400 transition-colors hover:text-neutral-300 flex items-center gap-3"
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4l11.733 16h4.267l-11.733 -16z" /><path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772" /></svg>
               </motion.a>
               <motion.a
                 href="/learnings"
@@ -212,6 +234,20 @@ export function Navigation() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Admin Dashboard Fixed Link */}
+      <a
+        href="/admin"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed top-6 right-6 z-[60] flex items-center justify-center p-2 rounded-full text-text-secondary opacity-0 hover:opacity-100 hover:bg-white/10 hover:text-white transition-all duration-300"
+        aria-label="Admin Dashboard"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+      </a>
     </>
   );
 }

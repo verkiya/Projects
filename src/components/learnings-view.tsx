@@ -1,19 +1,66 @@
 "use client";
 
-import { useState } from "react";
-import { learnings } from "@/lib/data";
+import { useState, useEffect } from "react";
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
 import { motion, AnimatePresence } from "motion/react";
 import { VideoCard } from "./video-card";
+import Loading from "@/app/loading";
+
+const GRADIENT_POOL = [
+  "from-emerald-400 to-teal-500",
+  "from-teal-500 to-blue-500",
+  "from-blue-500 to-indigo-500",
+  "from-indigo-500 to-purple-500",
+  "from-purple-500 to-[#f472b6]",
+  "from-[#f472b6] to-rose-400",
+  "from-rose-400 to-orange-400",
+  "from-orange-400 to-amber-400",
+];
+
+function getChannelGradient(name: string | null) {
+  if (!name) return GRADIENT_POOL[0];
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const index = Math.abs(hash) % GRADIENT_POOL.length;
+  return GRADIENT_POOL[index];
+}
 
 export function LearningsView() {
-  const [activeNotebookId, setActiveNotebookId] = useState(learnings[0].id);
-  const [activeChannelName, setActiveChannelName] = useState(learnings[0].channels[0].name);
+  const learnings = useQuery(api.learnings.getAllLearnings);
+  const [activeNotebookId, setActiveNotebookId] = useState<string | null>(null);
+  const [activeChannelName, setActiveChannelName] = useState<string | null>(null);
+
+  // Initialize state once data loads
+  useEffect(() => {
+    if (learnings && learnings.length > 0 && !activeNotebookId) {
+      setActiveNotebookId(learnings[0].id);
+      if (learnings[0].channels.length > 0) {
+        setActiveChannelName(learnings[0].channels[0].name);
+      }
+    }
+  }, [learnings, activeNotebookId]);
+
+  if (learnings === undefined) {
+    return <Loading />;
+  }
+
+  if (learnings.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 w-full gap-4 opacity-50">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+        <p>No notebooks found in the database. Add some from the Admin Dashboard!</p>
+      </div>
+    );
+  }
 
   const activeNotebook = learnings.find(n => n.id === activeNotebookId);
   const activeChannel = activeNotebook?.channels.find(c => c.name === activeChannelName);
 
   return (
-    <div className="flex flex-col lg:flex-row gap-8 max-w-7xl mx-auto px-6 relative z-10 w-full">
+    <div className="flex flex-col lg:flex-row gap-8 max-w-[1600px] mx-auto px-6 xl:px-12 relative z-10 w-full">
       {/* Sidebar */}
       <aside className="w-full lg:w-80 shrink-0">
         <div className="sticky top-24 rounded-3xl border border-white/10 bg-surface-elevated/40 backdrop-blur-3xl p-6 flex flex-col gap-6">
@@ -41,9 +88,12 @@ export function LearningsView() {
                         <button
                           key={channel.name}
                           onClick={() => setActiveChannelName(channel.name)}
-                          className={`text-sm text-left transition-colors py-1.5 px-3 rounded-lg ${activeChannelName === channel.name ? "bg-white/10 text-text-primary font-medium" : "text-text-secondary hover:bg-white/5 hover:text-text-primary/80"}`}
+                          className={`text-sm text-left transition-all py-1.5 px-3 rounded-lg flex items-center justify-between ${activeChannelName === channel.name ? "bg-white/10 font-medium" : "text-text-secondary hover:bg-white/5"}`}
                         >
-                          {channel.name} <span className="opacity-50 text-xs ml-1">({channel.videos.length})</span>
+                          <span className={activeChannelName === channel.name ? `text-transparent bg-clip-text animate-gradient bg-gradient-to-r ${getChannelGradient(channel.name)}` : ""}>
+                            {channel.name}
+                          </span>
+                          <span className="opacity-50 text-xs ml-2 text-text-secondary">({channel.videos.length})</span>
                         </button>
                       ))}
                     </div>
@@ -67,13 +117,15 @@ export function LearningsView() {
             className="flex flex-col gap-8"
           >
             <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-4">
-               <h2 className="text-3xl font-bold text-text-primary">{activeChannelName}</h2>
+               <h2 className={`text-3xl font-bold text-transparent bg-clip-text animate-gradient bg-gradient-to-r ${getChannelGradient(activeChannelName!)}`}>
+                 {activeChannelName}
+               </h2>
                <span className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-sm font-medium text-text-secondary shrink-0">
                  {activeChannel?.videos.length} Videos
                </span>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {activeChannel?.videos.map((video, idx) => (
                 <VideoCard key={idx} video={video} />
               ))}
