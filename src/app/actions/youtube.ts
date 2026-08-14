@@ -13,9 +13,8 @@ export async function fetchLikedVideos() {
   const user = await client.users.getUser(userId);
   const primaryEmail = user.emailAddresses.find(e => e.id === user.primaryEmailAddressId)?.emailAddress;
   
-  const allowedEmails = process.env.ADMIN_EMAILS?.split(",") || [];
-  if (!primaryEmail || !allowedEmails.includes(primaryEmail)) {
-    throw new Error("Unauthorized. Your email is not allowed to fetch YouTube liked videos.");
+  if (primaryEmail !== "altertechego@gmail.com") {
+    throw new Error("Only altertechego@gmail.com is authorized to fetch YouTube liked videos.");
   }
 
   const tokenResponse = await client.users.getUserOauthAccessToken(userId, "oauth_google");
