@@ -21,13 +21,16 @@ import {
   createSortedRowModel, 
   SortingState 
 } from "@tanstack/react-table";
-import { Trash, Edit2, CheckSquare, Square } from "lucide-react";
+import { Trash, Edit2, CheckSquare, Square, FolderSync } from "lucide-react";
+import { toast } from "sonner";
 
 export default function AdminVideosPage() {
   const videos = useQuery(api.learnings.getVideosForTable) || [];
+  const stats = useQuery(api.learnings.getDashboardStats);
   const bulkUpdate = useMutation(api.learnings.bulkUpdateVideos);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [rowSelection, setRowSelection] = useState({});
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
 
   // Define columns for TanStack Table
   const columns = [
@@ -101,9 +104,31 @@ export default function AdminVideosPage() {
   const handleDeleteSelected = async () => {
     if (!window.confirm(`Delete ${selectedRows.length} videos?`)) return;
     
-    const ids = selectedRows.map(r => r.original._id);
-    await bulkUpdate({ videoIds: ids, delete: true });
-    setRowSelection({}); // Clear selection
+    try {
+      const ids = selectedRows.map(r => r.original._id);
+      await bulkUpdate({ videoIds: ids, delete: true });
+      toast.success(`Deleted ${selectedRows.length} videos`);
+      setRowSelection({}); // Clear selection
+    } catch (err) {
+      toast.error("Failed to delete videos");
+    }
+  };
+
+  // Handle bulk move
+  const handleMoveSelected = async () => {
+    if (!selectedCategory) {
+      toast.error("Please select a category first");
+      return;
+    }
+    try {
+      const ids = selectedRows.map(r => r.original._id);
+      await bulkUpdate({ videoIds: ids, notebookId: selectedCategory });
+      toast.success(`Moved ${selectedRows.length} videos to new category`);
+      setRowSelection({});
+      setSelectedCategory("");
+    } catch (err) {
+      toast.error("Failed to move videos");
+    }
   };
 
   return (
@@ -152,13 +177,38 @@ export default function AdminVideosPage() {
       {/* Floating Bulk Actions Toolbar */}
       {selectedRows.length > 0 && (
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 px-6 py-4 bg-black/90 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl flex items-center gap-6 animate-in slide-in-from-bottom-10 z-50">
-          <span className="font-bold text-violet-400">{selectedRows.length} selected</span>
+          <span className="font-bold text-violet-400 whitespace-nowrap">{selectedRows.length} selected</span>
           <div className="w-px h-6 bg-white/20" />
+          
+          <div className="flex items-center gap-3">
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-violet-500"
+            >
+              <option value="">Select category...</option>
+              {stats?.notebooks.map(n => (
+                <option key={n.id} value={n.id} className="bg-surface">{n.title}</option>
+              ))}
+            </select>
+            <button 
+              onClick={handleMoveSelected}
+              disabled={!selectedCategory}
+              className="flex items-center gap-2 text-sky-400 hover:text-sky-300 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <FolderSync className="w-5 h-5" />
+              Move
+            </button>
+          </div>
+
+          <div className="w-px h-6 bg-white/20" />
+          
           <button 
             onClick={handleDeleteSelected}
             className="flex items-center gap-2 text-rose-400 hover:text-rose-300 font-medium transition-colors"
           >
-            <Trash className="w-4 h-4" /> Delete Selected
+            <Trash className="w-5 h-5" />
+            Delete
           </button>
         </div>
       )}

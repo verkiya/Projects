@@ -1,4 +1,4 @@
-import { query, mutation, internalMutation } from "./_generated/server";
+import { query, mutation, internalMutation, internalQuery } from "./_generated/server";
 import { v } from "convex/values";
 
 // Query that fetches everything and reconstructs the nested structure for LearningsView
@@ -344,5 +344,95 @@ export const internalDeduplicateVideos = internalMutation({
     }
 
     return { removed };
+  }
+});
+
+export const getStaleVideos = internalQuery({
+  args: { limit: v.number() },
+  handler: async (ctx, args) => {
+    const staleThreshold = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    
+    let stale = await ctx.db
+      .query("videos")
+      .filter((q) => q.eq(q.field("lastCheckedAt"), undefined))
+      .take(args.limit);
+      
+    if (stale.length < args.limit) {
+      const more = await ctx.db
+        .query("videos")
+        .withIndex("by_last_checked")
+        .filter((q) => q.lt(q.field("lastCheckedAt"), staleThreshold))
+        .take(args.limit - stale.length);
+      stale = stale.concat(more);
+    }
+    
+    return stale;
+  }
+});
+
+export const updateVideoStatus = internalMutation({
+  args: { 
+    id: v.id("videos"), 
+    status: v.union(v.literal("active"), v.literal("dead"), v.literal("private")) 
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.id, {
+      status: args.status,
+      lastCheckedAt: Date.now()
+    });
+  }
+});
+
+export const getVideosForTable = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db.query("videos").collect();
+  }
+});
+
+export const getDeadVideos = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db
+      .query("videos")
+      .withIndex("by_status")
+      .filter((q) => q.eq(q.field("status"), "dead"))
+      .collect();
+  }
+});
+
+export const bulkUpdateVideos = mutation({
+  args: { 
+    videoIds: v.array(v.id("videos")),
+    delete: v.optional(v.boolean()),
+    notebookId: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    for (const id of args.videoIds) {
+      if (args.delete) {
+        await ctx.db.delete(id);
+      } else if (args.notebookId) {
+        await ctx.db.patch(id, { notebookId: args.notebookId });
+      } else {
+        await ctx.db.patch(id, { status: "active" });
+      }
+    }
+  }
+});
+
+export const getDashboardStats = query({
+  args: {},
+  handler: async (ctx) => {
+    const videos = await ctx.db.query("videos").collect();
+    const channels = await ctx.db.query("channels").collect();
+    const notebooks = await ctx.db.query("notebooks").collect();
+
+    return {
+      totalVideos: videos.length,
+      totalChannels: channels.length,
+      totalNotebooks: notebooks.length,
+      videos: videos.map(v => ({ _creationTime: v._creationTime, notebookId: v.notebookId })),
+      notebooks: notebooks.map(n => ({ id: n.id, title: n.title }))
+    };
   }
 });

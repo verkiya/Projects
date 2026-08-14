@@ -12,6 +12,7 @@ import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { Trash, RefreshCcw, ExternalLink, Play } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function AdminHealthPage() {
   const deadVideos = useQuery(api.learnings.getDeadVideos) || [];
@@ -23,7 +24,12 @@ export default function AdminHealthPage() {
   const handleManualCheck = async () => {
     setIsRunningCheck(true);
     try {
+      toast.info("Health check started. This may take a minute...");
       await runCheck();
+      toast.success("Health check completed successfully!");
+    } catch (error) {
+      toast.error("Health check failed. Check console for details.");
+      console.error(error);
     } finally {
       setIsRunningCheck(false);
     }
@@ -37,6 +43,10 @@ export default function AdminHealthPage() {
     setIsDeleting(true);
     try {
       await bulkUpdate({ videoIds: deadVideos.map(v => v._id), delete: true });
+      toast.success(`Successfully deleted ${deadVideos.length} dead videos.`);
+    } catch (error) {
+      toast.error("Failed to delete videos.");
+      console.error(error);
     } finally {
       setIsDeleting(false);
     }

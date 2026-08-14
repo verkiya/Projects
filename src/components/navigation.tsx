@@ -1,12 +1,22 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import { navLinks } from "@/lib/data";
+import { Library, RefreshCcw, HeartPulse } from "lucide-react";
+
+const adminNavItems = [
+  { name: "Videos", href: "/admin/videos", icon: Library },
+  { name: "Curation", href: "/admin/curation", icon: RefreshCcw },
+  { name: "Health", href: "/admin/health", icon: HeartPulse },
+];
 
 export function Navigation() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const pathname = usePathname();
+  const isAdminPage = pathname?.startsWith("/admin");
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -47,6 +57,22 @@ export function Navigation() {
           <div className="flex items-center gap-4 md:gap-6">
             {/* Desktop Links */}
             <ul className="hidden items-center gap-3 md:flex">
+              {isAdminPage && adminNavItems.map((item) => (
+                <li key={item.href}>
+                  <a
+                    href={item.href}
+                    className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all shadow-sm ${
+                      pathname === item.href 
+                        ? "bg-white/10 text-white border border-white/20" 
+                        : "border border-white/10 bg-surface/50 text-text-secondary hover:bg-surface-elevated hover:text-white hover:scale-105"
+                    }`}
+                  >
+                    <item.icon className="w-4 h-4" />
+                    {item.name}
+                  </a>
+                </li>
+              ))}
+              
               <li>
                 <a
                   href="/"
@@ -169,6 +195,23 @@ export function Navigation() {
               }}
               className="flex h-full flex-col items-center justify-center gap-8"
             >
+              {isAdminPage && adminNavItems.map((item, i) => (
+                <motion.a
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMobileOpen(false)}
+                  initial={{ y: 16, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.1 + (i * 0.05) }}
+                  className={`text-2xl font-light transition-colors flex items-center gap-3 ${
+                    pathname === item.href ? "text-white" : "text-text-secondary hover:text-white"
+                  }`}
+                >
+                  <item.icon className="w-6 h-6" />
+                  {item.name}
+                </motion.a>
+              ))}
+
               <motion.a
                 href="https://verkiya.vercel.app/"
                 onClick={() => setMobileOpen(false)}
