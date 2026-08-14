@@ -39,6 +39,41 @@ export const importPlaylist = action({
   }
 });
 
+export const runManualHealthCheck = action({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthenticated.");
+    const allowedEmails = process.env.ADMIN_EMAILS?.split(",") || [];
+    if (allowedEmails.length > 0 && identity.email) {
+      if (!allowedEmails.includes(identity.email)) throw new Error("Unauthorized.");
+    }
+
+    // 1. Get a batch of stale videos
+    const videos = await ctx.runQuery(internal.learnings.getStaleVideos, { limit: 50 });
+    
+    // 2. Check each video
+    for (const video of videos) {
+      let isDead = false;
+      try {
+        const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(video.url)}`;
+        const response = await fetch(oembedUrl);
+        if (response.status === 404 || response.status === 401 || response.status === 403) {
+          isDead = true;
+        }
+      } catch (err) {
+        continue;
+      }
+      
+      // 3. Update status
+      await ctx.runMutation(internal.learnings.updateVideoStatus, {
+        id: video._id,
+        status: isDead ? "dead" : "active",
+      });
+    }
+  }
+});
+
 export const checkVideoAvailability = internalAction({
   args: {},
   handler: async (ctx) => {

@@ -8,15 +8,26 @@
  * to ensure the public Learnings page always has functioning content.
  */
 
-import { useQuery, useMutation } from "convex/react";
+import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
-import { Trash, RefreshCcw, ExternalLink } from "lucide-react";
+import { Trash, RefreshCcw, ExternalLink, Play } from "lucide-react";
 import { useState } from "react";
 
 export default function AdminHealthPage() {
   const deadVideos = useQuery(api.learnings.getDeadVideos) || [];
   const bulkUpdate = useMutation(api.learnings.bulkUpdateVideos);
+  const runCheck = useAction(api.actions.runManualHealthCheck);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isRunningCheck, setIsRunningCheck] = useState(false);
+
+  const handleManualCheck = async () => {
+    setIsRunningCheck(true);
+    try {
+      await runCheck();
+    } finally {
+      setIsRunningCheck(false);
+    }
+  };
 
   // This is a UI-triggered manual check (simulating what the cron does)
   // Usually, you'd trigger the action, but for this demo, we'll just list what's already flagged.
@@ -52,10 +63,20 @@ export default function AdminHealthPage() {
       
       <div className="p-6 rounded-2xl border border-rose-500/30 bg-rose-500/5 mt-4 flex items-center justify-between">
         <div>
-          <h2 className="font-bold text-rose-400 mb-1 flex items-center gap-2"><RefreshCcw className="w-4 h-4" /> Automated Checker</h2>
+          <h2 className="font-bold text-rose-400 mb-1 flex items-center gap-2"><RefreshCcw className={`w-4 h-4 ${isRunningCheck ? 'animate-spin' : ''}`} /> Automated Checker</h2>
           <p className="text-sm text-rose-200/70">The background checker runs weekly to ping the YouTube API and update this list.</p>
         </div>
-        <div className="text-3xl font-black text-rose-500">{deadVideos.length}</div>
+        <div className="flex items-center gap-6">
+          <button 
+            onClick={handleManualCheck}
+            disabled={isRunningCheck}
+            className="flex items-center gap-2 px-3 py-1.5 text-sm bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-colors disabled:opacity-50"
+          >
+            <Play className="w-3 h-3" />
+            {isRunningCheck ? "Running..." : "Run Manual Check"}
+          </button>
+          <div className="text-3xl font-black text-rose-500">{deadVideos.length}</div>
+        </div>
       </div>
 
       <div className="mt-8 space-y-3">
