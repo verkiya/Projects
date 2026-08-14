@@ -20,5 +20,9 @@ export default defineSchema({
     title: v.string(),
     videoId: v.optional(v.string()),
     url: v.string(),
-  }).index("by_channel", ["notebookId", "channelName"]),
+    status: v.optional(v.union(v.literal("active"), v.literal("dead"), v.literal("private"))), // Tracks video availability
+    lastCheckedAt: v.optional(v.number()), // Timestamp of last availability check
+  }).index("by_channel", ["notebookId", "channelName"])
+    .index("by_status", ["status"])
+    .index("by_last_checked", ["lastCheckedAt"]),
 });
