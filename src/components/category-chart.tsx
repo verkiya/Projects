@@ -27,7 +27,7 @@ export function CategoryChart() {
   const COLORS = ['#8b5cf6', '#ec4899', '#f97316', '#14b8a6', '#eab308'];
 
   return (
-    <div className="w-full h-[200px] relative p-4 bg-surface/30 border border-white/5 rounded-3xl backdrop-blur-sm">
+    <div className="w-full h-[200px] relative">
       {categoryData.length > 0 ? (
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>

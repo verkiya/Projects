@@ -1,26 +1,41 @@
 "use client";
 
 import { Navigation } from "@/components/navigation";
-import { Play, Clock, ArrowRight, Bookmark, Search, User, Video } from "lucide-react";
-import { useState } from "react";
-
-const MOCK_CHANNELS = [
-  { id: "c1", name: "Vercel", subscribers: "120K", category: "Engineering", avatar: "https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?q=80&w=100&auto=format&fit=crop" },
-  { id: "c2", name: "Andrej Karpathy", subscribers: "350K", category: "AI", avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=100&auto=format&fit=crop" },
-  { id: "c3", name: "Y Combinator", subscribers: "1.2M", category: "Business", avatar: "https://images.unsplash.com/photo-1556761175-5973dc0f32d7?q=80&w=100&auto=format&fit=crop" },
-];
-
-const MOCK_VIDEOS = [
-  { id: 1, channelId: "c1", title: "Building a Design System in React", duration: "45:20", img: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=800&auto=format&fit=crop" },
-  { id: 2, channelId: "c1", title: "Next.js App Router Deep Dive", duration: "1:15:00", img: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=800&auto=format&fit=crop" },
-  { id: 3, channelId: "c2", title: "Understanding Transformer Models", duration: "2:15:00", img: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=800&auto=format&fit=crop" },
-  { id: 4, channelId: "c2", title: "Let's build GPT: from scratch", duration: "1:56:00", img: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=800&auto=format&fit=crop" },
-  { id: 5, channelId: "c3", title: "Startup Growth Strategies", duration: "55:00", img: "https://images.unsplash.com/photo-1556761175-4b46a572b786?q=80&w=800&auto=format&fit=crop" },
-  { id: 6, channelId: "c3", title: "How to Pitch Your Company", duration: "30:20", img: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?q=80&w=800&auto=format&fit=crop" },
-];
+import { Play, Clock, ArrowRight, Search, Video } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useQuery } from "convex/react";
+import { api } from "../../../convex/_generated/api";
 
 export default function TestLayoutsPage() {
-  const [activeChannel, setActiveChannel] = useState(MOCK_CHANNELS[0].id);
+  const learnings = useQuery(api.learnings.getAllLearnings);
+  const [activeChannel, setActiveChannel] = useState<string | null>(null);
+
+  const channels = learnings?.flatMap(n => n.channels.map(c => ({ ...c, category: n.title }))) || [];
+  const videos = learnings?.flatMap(n => n.channels.flatMap(c => c.videos.map(v => ({ ...v, channelId: c._id })))) || [];
+
+  useEffect(() => {
+    if (channels.length > 0 && !activeChannel) {
+      setActiveChannel(channels[0]._id);
+    }
+  }, [channels, activeChannel]);
+
+  if (!learnings) return <div className="min-h-screen bg-background pt-32 text-center text-white">Loading database...</div>;
+
+  const MOCK_CHANNELS = channels.map(c => ({
+    id: c._id,
+    name: c.name,
+    subscribers: "10K+",
+    category: c.category,
+    avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(c.name)}&background=random&color=fff`
+  }));
+
+  const MOCK_VIDEOS = videos.map(v => ({
+    id: v._id,
+    channelId: v.channelId,
+    title: v.title,
+    duration: "10:00",
+    img: `https://img.youtube.com/vi/${v.videoId}/maxresdefault.jpg`
+  }));
 
   return (
     <>
