@@ -21,7 +21,6 @@ export default async function AdminLayout({
   }
 
   const navItems = [
-    { name: "Overview", href: "/admin", icon: LayoutDashboard },
     { name: "Videos", href: "/admin/videos", icon: Library },
     { name: "Curation", href: "/admin/curation", icon: RefreshCcw },
     { name: "Health", href: "/admin/health", icon: HeartPulse },
