@@ -46,7 +46,8 @@ export function ProjectCard({ project }: ProjectCardProps) {
       {(project.links.quickDemo || project.links.demo) && (
         <button
           onClick={() => setFlippedState(flippedState === 'demo' ? 'front' : 'demo')}
-          className="absolute -left-4 md:-left-8 lg:-left-20 top-1/2 -translate-y-1/2 z-50 flex items-center gap-2 rounded-full bg-surface-elevated/95 backdrop-blur-xl border border-white/20 px-3 py-2 md:px-5 md:py-3 shadow-[0_0_40px_-10px_rgba(0,0,0,0.5)] text-text-primary transition-all hover:scale-105 hover:border-white/40 cursor-pointer group"
+          className="absolute -left-4 md:-left-8 lg:-left-20 top-1/2 -translate-y-1/2 z-50 flex items-center gap-2 rounded-full border border-white/20 px-3 py-2 md:px-5 md:py-3 shadow-[0_0_40px_-10px_rgba(0,0,0,0.5)] text-white transition-all hover:scale-105 hover:border-white/40 cursor-pointer group"
+          style={{ background: project.themeColor ? `linear-gradient(135deg, ${project.themeColor}, ${project.themeColor}99)` : 'rgba(255,255,255,0.1)' }}
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             {flippedState === 'demo' ? (
@@ -63,7 +64,8 @@ export function ProjectCard({ project }: ProjectCardProps) {
       {project.links.video && (
         <button
           onClick={() => setFlippedState(flippedState === 'walkthrough' ? 'front' : 'walkthrough')}
-          className="absolute -right-4 md:-right-8 lg:-right-20 top-1/2 -translate-y-1/2 z-50 flex items-center gap-2 rounded-full bg-surface-elevated/95 backdrop-blur-xl border border-white/20 px-3 py-2 md:px-5 md:py-3 shadow-[0_0_40px_-10px_rgba(0,0,0,0.5)] text-text-primary transition-all hover:scale-105 hover:border-white/40 cursor-pointer group"
+          className="absolute -right-4 md:-right-8 lg:-right-20 top-1/2 -translate-y-1/2 z-50 flex items-center gap-2 rounded-full border border-white/20 px-3 py-2 md:px-5 md:py-3 shadow-[0_0_40px_-10px_rgba(0,0,0,0.5)] text-white transition-all hover:scale-105 hover:border-white/40 cursor-pointer group"
+          style={{ background: project.themeColor ? `linear-gradient(135deg, ${project.themeColor}, ${project.themeColor}99)` : 'rgba(255,255,255,0.1)' }}
         >
           <span className="hidden md:inline font-semibold text-sm">{flippedState === 'walkthrough' ? 'Close Video' : 'Project Walkthrough'}</span>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
