@@ -135,13 +135,30 @@ export const projects: Project[] = [
       video: "https://www.youtube.com/embed/kqRMQaGJtqk?si=x7ENHF_Oy3eQ0cXe"
     },
     architecture: {
-      overview: "An AI-first web IDE built for real-time collaboration and reliable background processing.",
-      stack: ["Next.js", "Convex", "Inngest", "CodeMirror"],
-      decisions: ["Convex for real-time data sync", "Inngest for agent workflows", "CodeMirror for custom editor extensions"],
-      scaling: [],
-      tradeoffs: [],
-      challenges: [],
-      lessons: [],
+      overview: "A full-featured browser IDE that combines a real code editor, AI coding assistant, live preview environment, and GitHub integration into one cohesive tool.",
+      stack: ["Next.js", "Convex", "Inngest", "WebContainers", "Clerk", "CodeMirror", "AgentKit", "Zustand"],
+      decisions: [
+        "Convex for real-time file sync and cross-session AI quota tracking", 
+        "Inngest for background workflows that survive tab close", 
+        "WebContainers for zero-install browser Node.js runtime", 
+        "State lifecycle separation (Zustand for ephemeral, Convex for durable)"
+      ],
+      scaling: [
+        "Gemini Flash pool for high-capacity low-latency ghost text", 
+        "Model routing strategy to balance cost and latency based on task size"
+      ],
+      tradeoffs: [
+        "WebContainer singleton constraint requires global COEP/COOP headers", 
+        "Convex requires dual auth model (Clerk for users + internal API key for background workers)"
+      ],
+      challenges: [
+        "Coordinating durable cloud state, ephemeral browser state, and transient editor state", 
+        "Managing WebContainer lifecycle to prevent orphaned instances"
+      ],
+      lessons: [
+        "Different types of state have different lifecycles, persistence requirements, and latency profiles", 
+        "System Prompt Design uses XML tags for higher fidelity LLM parsing"
+      ],
     }
   },
   {
@@ -175,13 +192,31 @@ export const projects: Project[] = [
       video: "https://www.youtube.com/embed/Bt2X_5rsFO0?si=xr5tfJzCoooIWq1J"
     },
     architecture: {
-      overview: "Combines self-hosted inference with robust multi-tenant capabilities, metered billing, and secure media delivery.",
-      stack: ["Next.js", "Modal TTS", "AWS S3", "tRPC", "Prisma"],
-      decisions: ["Self-hosted Chatterbox TTS", "Multi-tenant architecture", "Signed URL delivery"],
-      scaling: [],
-      tradeoffs: [],
-      challenges: [],
-      lessons: [],
+      overview: "A full-stack AI voice generation platform built for scale. It combines self-hosted inference with robust multi-tenant capabilities, metered billing, and secure media delivery.",
+      stack: ["Next.js", "React", "tRPC", "Prisma", "PostgreSQL", "FastAPI", "Modal", "AWS S3", "Clerk", "Polar"],
+      decisions: [
+        "Self-hosted Chatterbox TTS on Modal for infrastructure control", 
+        "Clerk-backed Next.js Proxy for strict multi-tenant organization isolation", 
+        "Polar SDK for metered billing with post-success usage events",
+        "Signed URL delivery ensures S3 buckets stay private"
+      ],
+      scaling: [
+        "Modal class configured with scaledown_window for worker elasticity",
+        "Debounced searches and WaveSurfer.js progressive streaming"
+      ],
+      tradeoffs: [
+        "Self-hosting shifts generation cost and reliability concerns to owned infrastructure", 
+        "Prisma connection exhaustion in development required a process-level singleton"
+      ],
+      challenges: [
+        "Signed URL expiry during playback required generating fresh URLs at playback time", 
+        "Browser recording compatibility across devices required MIME normalization"
+      ],
+      lessons: [
+        "Owning inference changes the operating model", 
+        "Multi-tenancy must be foundational from day one", 
+        "Billing is architecture, not UI"
+      ],
     }
   },
   {
@@ -220,13 +255,30 @@ export const projects: Project[] = [
       github: "https://github.com/verkiya/Forgeflow"
     },
     architecture: {
-      overview: "A collaborative visual workflow builder that runs scalable background browser automation tasks.",
-      stack: ["Next.js", "Trigger.dev", "Browserbase", "Liveblocks", "Neon Postgres"],
-      decisions: ["Server-side state validation", "Real-time canvas with Liveblocks", "Durable execution via Trigger.dev"],
-      scaling: [],
-      tradeoffs: [],
-      challenges: [],
-      lessons: [],
+      overview: "A collaborative visual workflow builder for browser automation with a durable execution engine and server-mediated replay.",
+      stack: ["Next.js", "React Flow", "Trigger.dev", "Browserbase", "Liveblocks", "Neon Postgres", "Clerk", "Drizzle"],
+      decisions: [
+        "Liveblocks for low-latency collaborative canvas edits", 
+        "Neon Postgres JSONB for organization-owned workflow graph snapshots", 
+        "Trigger.dev for durable background task execution",
+        "Browserbase-hosted Stagehand session shared by all browser nodes in one run"
+      ],
+      scaling: [
+        "Trigger metadata publishes pending/running/done state in realtime", 
+        "Graph execution is topologically sorted and fails fast"
+      ],
+      tradeoffs: [
+        "Graph save is a replace-all transaction; last writer wins", 
+        "Browser session replay is intentionally server-mediated requiring auth chain"
+      ],
+      challenges: [
+        "Maintaining serializable React Flow data across Liveblocks, JSONB, and browser props", 
+        "Idempotency strategy for external side effects like sending emails"
+      ],
+      lessons: [
+        "Clerk organizations are the tenancy boundary; every sensitive action repeats authorization on the server", 
+        "Background-task boundaries must be deterministic about input"
+      ],
     }
   },
   {
@@ -263,13 +315,28 @@ export const projects: Project[] = [
       video: "https://www.youtube.com/embed/Kzj0nWjRPZs"
     },
     architecture: {
-      overview: "A multi-tenant AI support platform with a separate dashboard for operators and an embeddable widget for visitors.",
-      stack: ["Next.js", "Convex", "Clerk", "Vapi"],
-      decisions: ["Convex for realtime agent RAG and sync", "Clerk for multi-tenant organizations", "Vapi for browser voice calls"],
-      scaling: [],
-      tradeoffs: [],
-      challenges: [],
-      lessons: [],
+      overview: "A multi-tenant AI support platform with an embeddable chat and voice widget, backed by organization-scoped RAG namespaces.",
+      stack: ["Next.js", "Convex", "Clerk", "Vapi", "OpenAI", "Jotai", "Sentry"],
+      decisions: [
+        "Convex Agent for resolving threaded conversations and RAG searches", 
+        "Clerk Organizations for tenant-scoped billing and knowledge base boundaries", 
+        "Jotai for widget/dashboard-local state management",
+        "AES-256-GCM encryption for organization-owned Vapi configurations"
+      ],
+      scaling: [
+        "Knowledge base ingestion with content hashing and isolated RAG namespaces"
+      ],
+      tradeoffs: [
+        "Private provider material is encrypted in Convex storage and intentionally stripped before widget delivery"
+      ],
+      challenges: [
+        "Contact sessions are persisted per organization and verified against every public conversation", 
+        "Loading UI requires a cancellation-safe initialization sequence"
+      ],
+      lessons: [
+        "The dashboard and embed have different trust models", 
+        "All knowledge-base entries must be namespaced by organization to prevent tenant leakage"
+      ],
     }
   },
   {
@@ -310,13 +377,28 @@ export const projects: Project[] = [
       github: "https://github.com/verkiya/GameGenPlay"
     },
     architecture: {
-      overview: "An agentic 3D-game workspace utilizing a plain-language prompt to provision an isolated sandbox and run a durable chat agent.",
-      stack: ["Next.js", "Trigger.dev", "Daytona", "Neon Postgres", "Clerk"],
-      decisions: ["Durable agent work stays in Trigger.dev", "Generated code executes in a per-game Daytona sandbox", "Postgres for durable game state"],
-      scaling: [],
-      tradeoffs: [],
-      challenges: [],
-      lessons: [],
+      overview: "An agentic 3D-game workspace where a durable chat agent plans, builds, and previews games from natural-language prompts in an isolated runtime.",
+      stack: ["Next.js", "Trigger.dev", "Daytona", "Neon Postgres", "Clerk", "Anthropic", "Drizzle"],
+      decisions: [
+        "Daytona sandboxes for isolated generated code execution and preview servers", 
+        "Trigger.dev for running the durable multi-step agent loop", 
+        "Postgres via Drizzle for durable game metadata and chat cursor state",
+        "Idempotent Postgres ledger entries for per-model-step usage charging"
+      ],
+      scaling: [
+        "Agent is bounded to 48 tool/model steps per turn to manage execution time and token usage"
+      ],
+      tradeoffs: [
+        "Browser interaction stays in React, durable state in Postgres, long-running agent work in Trigger.dev"
+      ],
+      challenges: [
+        "Resumable chat required persisting messages, access token, and stream cursor atomically", 
+        "Sandboxes created before ID persistence needed cleanup by game label"
+      ],
+      lessons: [
+        "Authorization is enforced in query predicates and server actions, not trusted from client identifiers", 
+        "A game can finish a started turn after credit reaches zero to avoid half-written worlds"
+      ],
     }
   },
   {
@@ -350,13 +432,29 @@ export const projects: Project[] = [
       video: "https://www.youtube.com/embed/21iRAKUv2gA"
     },
     architecture: {
-      overview: "A visual workflow automation application built with Next.js, React Flow, and Inngest.",
-      stack: ["Next.js", "React Flow", "Inngest", "Better Auth", "PostgreSQL"],
-      decisions: ["Inngest for background execution", "React Flow for visual graph building", "Postgres for durable execution state"],
-      scaling: [],
-      tradeoffs: [],
-      challenges: [],
-      lessons: [],
+      overview: "A visual workflow automation engine allowing users to build directed graphs, configure external triggers, and execute durable background tasks.",
+      stack: ["Next.js", "React Flow", "Inngest", "Better Auth", "Prisma", "PostgreSQL", "tRPC", "Polar"],
+      decisions: [
+        "Inngest for background execution and transient Realtime status channels", 
+        "React Flow for visual graph building in a full-screen editor", 
+        "PostgreSQL for durable execution state and workflow metadata",
+        "Better Auth for application identity and Polar for premium feature gates"
+      ],
+      scaling: [
+        "Execution logic sorts the graph topologically and runs one node at a time with a carried context object"
+      ],
+      tradeoffs: [
+        "No autosave or partial graph updates; saving is a replace-all transaction", 
+        "AI credential IDs are stored inside Node JSON data instead of populated schema relations"
+      ],
+      challenges: [
+        "Public webhook routes enqueue workflows but currently lack replay protection or signature verification", 
+        "Editing an unchanged encrypted credential can encrypt ciphertext again"
+      ],
+      lessons: [
+        "Keep plaintext secrets server-side and out of context/logging paths", 
+        "Realtime channels are provider-wide and transient, separate from durable execution history"
+      ],
     }
   }
 ];
