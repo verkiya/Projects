@@ -20,7 +20,7 @@ const PLACEHOLDER_IMAGES = [
 ];
 
 export function ProjectCard({ project }: ProjectCardProps) {
-  const [flippedState, setFlippedState] = useState<"front" | "demo" | "walkthrough">("front");
+  const [flippedState, setFlippedState] = useState<"front" | "demo" | "walkthrough" | "architecture">("front");
   const isFlipped = flippedState !== "front";
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
@@ -30,7 +30,13 @@ export function ProjectCard({ project }: ProjectCardProps) {
   const marqueeImages = [...images, ...images];
 
   return (
-    <div className="relative w-full max-w-[95vw] xl:max-w-[1400px] mx-auto my-8 [perspective:2000px] group">
+    <motion.div 
+      initial={{ opacity: 0, y: 80 }} 
+      whileInView={{ opacity: 1, y: 0 }} 
+      viewport={{ once: true, margin: "-100px" }} 
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      className="relative w-full max-w-[95vw] xl:max-w-[1400px] mx-auto my-8 [perspective:2000px] group"
+    >
 
       {/* Vibrant Ambient Glow */}
       <div
@@ -137,7 +143,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
                    href={project.links.demo}
                    target="_blank"
                    rel="noopener noreferrer"
-                   className="inline-flex h-9 items-center rounded-full bg-surface-elevated border border-white/20 px-4 text-sm font-semibold text-text-primary transition-all hover:scale-105 shadow-md hover:border-white/40 cursor-pointer"
+                   className="inline-flex h-9 items-center gap-2 rounded-full bg-surface-elevated/80 backdrop-blur-md border border-white/10 px-4 text-sm font-semibold text-text-primary transition-all hover:scale-105 hover:bg-white/10 hover:border-white/20 shadow-lg cursor-pointer"
                  >
                    {project.icon && (
                      <Image
@@ -163,6 +169,17 @@ export function ProjectCard({ project }: ProjectCardProps) {
                   </svg>
                   <span>Source Code</span>
                 </a>
+              )}
+              {project.architecture && (
+                <button
+                  onClick={() => setFlippedState('architecture')}
+                  className="inline-flex h-9 items-center gap-2 rounded-full bg-surface-elevated/80 backdrop-blur-md border border-white/10 px-4 text-sm font-semibold text-text-primary transition-all hover:scale-105 hover:bg-white/10 hover:border-white/20 shadow-lg cursor-pointer"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                  </svg>
+                  <span>Architecture</span>
+                </button>
               )}
             </motion.div>
           </div>
@@ -226,8 +243,102 @@ export function ProjectCard({ project }: ProjectCardProps) {
             />
           </div>
 
-          <div className="flex-1 w-full h-full relative">
-            {isFlipped && (
+          <div className="flex-1 w-full h-full relative overflow-hidden rounded-[2.5rem]">
+            {isFlipped && flippedState === 'architecture' ? (
+              <div 
+                className="absolute inset-0 overflow-y-auto p-8 md:p-12 text-left custom-scrollbar"
+                style={{
+                  background: project.themeColor 
+                    ? `radial-gradient(circle at 100% 100%, ${project.themeColor}33 0%, rgba(0,0,0,0.95) 50%, rgba(0,0,0,1) 100%)` 
+                    : 'rgba(0,0,0,0.95)'
+                }}
+              >
+                 <div className="flex items-center justify-between mb-8">
+                    <h3 className="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text tracking-tight" style={{ backgroundImage: `linear-gradient(to right, #fff, ${project.themeColor || '#ccc'})` }}>
+                      Architecture Deep Dive
+                    </h3>
+                    <button onClick={() => setFlippedState('front')} className="p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors backdrop-blur-md cursor-pointer border border-white/10 hover:scale-110">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-white"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                 </div>
+                 
+                 <p className="text-white/90 text-lg md:text-xl leading-relaxed mb-12 font-medium max-w-4xl">{project.architecture.overview}</p>
+                 
+                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                   
+                   {project.architecture.decisions && project.architecture.decisions.length > 0 && (
+                     <div>
+                       <h4 className="text-lg md:text-xl font-bold mb-5 flex items-center gap-3 border-b border-white/10 pb-3" style={{ color: project.themeColor }}>
+                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                         Key Decisions
+                       </h4>
+                       <ul className="space-y-4 text-white/80">
+                         {project.architecture.decisions.map(d => (
+                           <li key={d} className="flex gap-3 items-start leading-snug"><span style={{ color: project.themeColor }} className="mt-0.5 text-lg">✦</span> <span>{d}</span></li>
+                         ))}
+                       </ul>
+                     </div>
+                   )}
+
+                   {project.architecture.challenges && project.architecture.challenges.length > 0 && (
+                     <div>
+                       <h4 className="text-lg md:text-xl font-bold mb-5 flex items-center gap-3 border-b border-white/10 pb-3" style={{ color: project.themeColor }}>
+                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                         Challenges
+                       </h4>
+                       <ul className="space-y-4 text-white/80">
+                         {project.architecture.challenges.map(d => (
+                           <li key={d} className="flex gap-3 items-start leading-snug"><span style={{ color: project.themeColor }} className="mt-0.5 text-lg">✦</span> <span>{d}</span></li>
+                         ))}
+                       </ul>
+                     </div>
+                   )}
+
+                   {project.architecture.tradeoffs && project.architecture.tradeoffs.length > 0 && (
+                     <div>
+                       <h4 className="text-lg md:text-xl font-bold mb-5 flex items-center gap-3 border-b border-white/10 pb-3" style={{ color: project.themeColor }}>
+                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                         Tradeoffs
+                       </h4>
+                       <ul className="space-y-4 text-white/80">
+                         {project.architecture.tradeoffs.map(d => (
+                           <li key={d} className="flex gap-3 items-start leading-snug"><span style={{ color: project.themeColor }} className="mt-0.5 text-lg">✦</span> <span>{d}</span></li>
+                         ))}
+                       </ul>
+                     </div>
+                   )}
+
+                   {project.architecture.scaling && project.architecture.scaling.length > 0 && (
+                     <div>
+                       <h4 className="text-lg md:text-xl font-bold mb-5 flex items-center gap-3 border-b border-white/10 pb-3" style={{ color: project.themeColor }}>
+                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                         Scale & Performance
+                       </h4>
+                       <ul className="space-y-4 text-white/80">
+                         {project.architecture.scaling.map(d => (
+                           <li key={d} className="flex gap-3 items-start leading-snug"><span style={{ color: project.themeColor }} className="mt-0.5 text-lg">✦</span> <span>{d}</span></li>
+                         ))}
+                       </ul>
+                     </div>
+                   )}
+
+                   {project.architecture.lessons && project.architecture.lessons.length > 0 && (
+                     <div>
+                       <h4 className="text-lg md:text-xl font-bold mb-5 flex items-center gap-3 border-b border-white/10 pb-3" style={{ color: project.themeColor }}>
+                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                         Lessons Learned
+                       </h4>
+                       <ul className="space-y-4 text-white/80">
+                         {project.architecture.lessons.map(d => (
+                           <li key={d} className="flex gap-3 items-start leading-snug"><span style={{ color: project.themeColor }} className="mt-0.5 text-lg">✦</span> <span>{d}</span></li>
+                         ))}
+                       </ul>
+                     </div>
+                   )}
+
+                 </div>
+              </div>
+            ) : isFlipped ? (
               <iframe
                 className="absolute inset-0 w-full h-full rounded-[2.5rem]"
                 src={flippedState === 'demo' ? (project.links.quickDemo || project.links.demo || "") : (project.links.video || "https://www.youtube.com/embed/dQw4w9WgXcQ?controls=1&rel=0")}
@@ -235,7 +346,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
                 allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               />
-            )}
+            ) : null}
           </div>
         </article>
 
@@ -282,6 +393,6 @@ export function ProjectCard({ project }: ProjectCardProps) {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 }
